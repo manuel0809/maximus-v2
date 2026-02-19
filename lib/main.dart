@@ -1,121 +1,203 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() {
-  runApp(const MyApp());
+// ==========================================
+// 1. CAPA DE INICIALIZACIÓN
+// ==========================================
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  await Supabase.initialize(
+    url: 'https://zeirkcjvddvkugpsxtit.supabase.co', 
+    anonKey: 'sb_publishable_z1A-bV02S3qAC5Upm09DNg_0A8f499m',
+  );
+
+  runApp(const MaximusApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MaximusApp extends StatelessWidget {
+  const MaximusApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      title: 'Maximus Level Group',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        brightness: Brightness.dark,
+        primaryColor: const Color(0xFFD4AF37), // Dorado Premium
+        scaffoldBackgroundColor: Colors.black,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const LuxuryLandingPage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+// ==========================================
+// 2. CAPA DE PRESENTACIÓN (UI)
+// ==========================================
+class LuxuryLandingPage extends StatefulWidget {
+  const LuxuryLandingPage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<LuxuryLandingPage> createState() => _LuxuryLandingPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _LuxuryLandingPageState extends State<LuxuryLandingPage> {
+  // Controladores de texto
+  final _nameController = TextEditingController();
+  final _pickupController = TextEditingController();
+  final _dropoffController = TextEditingController();
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  // ==========================================
+  // 3. CAPA DE LÓGICA (BUSINESS LOGIC)
+  // ==========================================
+  Future<void> _processBooking() async {
+    // Validación simple
+    if (_nameController.text.isEmpty || _pickupController.text.isEmpty) {
+      _showNotification("Por favor, complete los campos obligatorios", isError: true);
+      return;
+    }
+
+    try {
+      await Supabase.instance.client.from('reservas').insert({
+        'texto del nombre del cliente': _nameController.text,
+        'texto de la dirección de recogida': _pickupController.text,
+        'texto de la dirección de destino': _dropoffController.text,
+        'texto de estado': 'Pendiente de Contacto',
+      });
+
+      _showNotification("Solicitud de lujo enviada. Maximus le contactará en breve.");
+      _clearFields();
+    } catch (e) {
+      _showNotification("Error de red. Intente de nuevo.", isError: true);
+    }
+  }
+
+  void _showNotification(String msg, {bool isError = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        backgroundColor: isError ? Colors.red : const Color(0xFFD4AF37),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _clearFields() {
+    _nameController.clear();
+    _pickupController.clear();
+    _dropoffController.clear();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _pickupController.dispose();
+    _dropoffController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+      body: Stack(
+        children: [
+          // Capa de Fondo (Imagen de alta resolución)
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: NetworkImage('https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=2000'), // Imagen de auto de lujo
+                fit: BoxFit.cover,
+              ),
             ),
-          ],
-        ),
+          ),
+          // Capa de Gradiente (Efecto cine)
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.black.withOpacity(0.9), Colors.transparent],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+            ),
+          ),
+          // Capa de Contenido
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 80),
+            child: Row(
+              children: [
+                // Lado Izquierdo: Branding
+                Expanded(
+                  flex: 2,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text("MAXIMUS", 
+                        style: TextStyle(color: Color(0xFFD4AF37), fontSize: 90, letterSpacing: 25, fontWeight: FontWeight.w100)),
+                      const Text("LEVEL GROUP", 
+                        style: TextStyle(color: Colors.white, fontSize: 18, letterSpacing: 10)),
+                      const SizedBox(height: 40),
+                      const Text("REDEFINING\nEXCLUSIVITY", 
+                        style: TextStyle(color: Colors.white, fontSize: 50, fontWeight: FontWeight.bold, height: 1.1)),
+                      const SizedBox(height: 30),
+                      Container(height: 3, width: 80, color: const Color(0xFFD4AF37)),
+                    ],
+                  ),
+                ),
+                // Lado Derecho: Formulario "Glass"
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(40),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.3)),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text("REQUEST CHAUFFEUR", style: TextStyle(letterSpacing: 3, fontWeight: FontWeight.bold, color: Colors.white)),
+                        const SizedBox(height: 30),
+                        _luxuryField(_nameController, "FULL NAME", Icons.person_outline),
+                        const SizedBox(height: 20),
+                        _luxuryField(_pickupController, "PICKUP LOCATION", Icons.location_on_outlined),
+                        const SizedBox(height: 20),
+                        _luxuryField(_dropoffController, "DESTINATION", Icons.flag_outlined),
+                        const SizedBox(height: 40),
+                        ElevatedButton(
+                          onPressed: _processBooking,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFD4AF37),
+                            foregroundColor: Colors.black,
+                            minimumSize: const Size(double.infinity, 60),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                          ),
+                          child: const Text("BOOK NOW", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+    );
+  }
+
+  Widget _luxuryField(TextEditingController controller, String label, IconData icon) {
+    return TextField(
+      controller: controller,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.white54, fontSize: 12),
+        prefixIcon: Icon(icon, color: const Color(0xFFD4AF37)),
+        enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
+        focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFFD4AF37))),
       ),
     );
   }
