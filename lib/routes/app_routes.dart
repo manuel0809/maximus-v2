@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../presentation/splash_screen/splash_screen.dart';
 import '../presentation/login_registration_screen/login_registration_screen.dart';
+import '../presentation/login_registration_screen/login_premium_screen.dart';
 import '../presentation/client_dashboard/client_dashboard.dart';
 import '../presentation/admin_dashboard/admin_dashboard.dart';
 import '../presentation/car_rental_booking_screen/car_rental_booking_screen.dart';
@@ -83,7 +84,8 @@ class AppRoutes {
   static Map<String, WidgetBuilder> routes = {
     initial: (context) => const SplashScreen(),
     splash: (context) => const SplashScreen(),
-    loginRegistration: (context) => const LoginRegistrationScreen(),
+    loginRegistration: (context) => const LoginPremiumScreen(),
+    '/login-registration-screen-manual': (context) => const LoginRegistrationScreen(),
     clientDashboard: (context) => ClientDashboard(),
     adminDashboard: (context) => const AdminDashboard(),
     driverDashboard: (context) => const DriverDashboardScreen(),
