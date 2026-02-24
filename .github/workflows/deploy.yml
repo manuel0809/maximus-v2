@@ -43,4 +43,4 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./build/web/
           server-dir: ./public_html/
-          dangerous-clean-slate: false # Set to true only if you want to delete existing files not in the current build
+          dangerous-clean-slate: true # Purge old files to ensure only the new build is present
