@@ -145,8 +145,9 @@ class _AdminSummaryDashboardScreenState extends State<AdminSummaryDashboardScree
                 Icons.history_toggle_off,
                 Colors.orange,
                 () async {
+                   final messenger = ScaffoldMessenger.of(context);
                    await AutomationService.instance.processLateReturnFines();
-                   ScaffoldMessenger.of(context).showSnackBar(
+                   messenger.showSnackBar(
                      const SnackBar(content: Text('Proceso de multas completado')),
                    );
                 }
@@ -159,8 +160,9 @@ class _AdminSummaryDashboardScreenState extends State<AdminSummaryDashboardScree
                 Icons.summarize_outlined,
                 Colors.blue,
                 () async {
+                   final messenger = ScaffoldMessenger.of(context);
                    await AutomationService.instance.generateWeeklyReport();
-                   ScaffoldMessenger.of(context).showSnackBar(
+                   messenger.showSnackBar(
                      const SnackBar(content: Text('Reporte semanal generado y guardado')),
                    );
                 }

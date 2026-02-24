@@ -8,7 +8,6 @@ import '../../core/constants/app_roles.dart';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:ui';
 
 /// Modern authentication screen with tabbed interface for login and registration
 class LoginRegistrationScreen extends StatefulWidget {

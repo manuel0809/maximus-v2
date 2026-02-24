@@ -1,5 +1,6 @@
 
 import 'package:supabase/supabase.dart';
+import 'package:flutter/foundation.dart';
 
 void main() async {
   const supabaseUrl = 'https://metapwzflvslnivcsedu.supabase.co';
@@ -11,7 +12,7 @@ void main() async {
   final password = 'M@nuel08';
 
   try {
-    print('Creating admin user...');
+    debugPrint('Creating admin user...');
     
     final response = await supabase.auth.signUp(
       email: email,
@@ -23,15 +24,15 @@ void main() async {
     );
 
     if (response.user != null) {
-      print('✅ Admin user created successfully!');
-      print('Email: $email');
-      print('Password: $password');
-      print('ID: ${response.user!.id}');
+      debugPrint('✅ Admin user created successfully!');
+      debugPrint('Email: $email');
+      debugPrint('Password: $password');
+      debugPrint('ID: ${response.user!.id}');
     } else {
-      print('⚠️ User creation response was null (might be existing user or email confirmation required).');
+      debugPrint('⚠️ User creation response was null (might be existing user or email confirmation required).');
     }
   } catch (e, stackTrace) {
-    print('❌ Error creating user: $e');
-    print('Stack trace: $stackTrace');
+    debugPrint('❌ Error creating user: $e');
+    debugPrint('Stack trace: $stackTrace');
   }
 }

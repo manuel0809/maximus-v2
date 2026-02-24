@@ -13,8 +13,6 @@ import './widgets/promotional_banner_widget.dart';
 import './widgets/recent_booking_card_widget.dart';
 import './widgets/service_tile_widget.dart';
 import './widgets/active_rental_card_widget.dart';
-import '../../widgets/premium_card.dart';
-import '../../services/car_rental_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ClientDashboardInitialPage extends StatefulWidget {
@@ -36,7 +34,7 @@ class _ClientDashboardInitialPageState
 
   final NotificationService _notificationService = NotificationService.instance;
   final RealtimeService _realtimeService = RealtimeService.instance;
-  final CarRentalService _carRentalService = CarRentalService.instance;
+  
   
   Map<String, dynamic>? activeRental;
 
@@ -93,7 +91,30 @@ class _ClientDashboardInitialPageState
     },
   ];
 
-  final List<Map<String, dynamic>> recentBookings = [];
+  final List<Map<String, dynamic>> recentBookings = [
+    {
+      "serviceName": "SUV de Lujo - Miami Beach",
+      "serviceType": "SUV Executive",
+      "date": "18 Feb",
+      "time": "20:30",
+      "status": "Completado",
+      "statusColor": const Color(0xFF4CAF50),
+      "image": "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=800",
+      "semanticLabel": "SUV Executive en Miami",
+      "canRebook": true,
+    },
+    {
+      "serviceName": "Sedán Premium - Aeropuerto MIA",
+      "serviceType": "Sedan Black",
+      "date": "16 Feb",
+      "time": "14:15",
+      "status": "Completado",
+      "statusColor": const Color(0xFF4CAF50),
+      "image": "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=800",
+      "semanticLabel": "Sedán Premium en el aeropuerto",
+      "canRebook": true,
+    },
+  ];
 
   @override
   void initState() {
@@ -245,7 +266,7 @@ class _ClientDashboardInitialPageState
       }
 
       Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
       );
 
       // Reverse geocode using Nominatim
@@ -376,7 +397,11 @@ class _ClientDashboardInitialPageState
                             // Services Grid
                             _buildServicesSection(theme, localization),
                             SizedBox(height: 3.h),
-    
+
+                            // Recent Bookings
+                            _buildRecentBookingsSection(theme, localization),
+                            SizedBox(height: 3.h),
+
                             // Promotional Banner
                             if (showPromoBanner) ...[
                               PromotionalBannerWidget(onDismiss: _dismissPromoBanner),
@@ -424,7 +449,7 @@ class _ClientDashboardInitialPageState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${localization.translate('welcome').toUpperCase()}',
+                      localization.translate('welcome').toUpperCase(),
                       style: theme.textTheme.labelMedium?.copyWith(
                         color: const Color(0xFFD4AF37).withValues(alpha: 0.8),
                         letterSpacing: 3.5,

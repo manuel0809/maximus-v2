@@ -7,7 +7,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../services/messaging_service.dart';
 import '../../widgets/custom_app_bar.dart';
 import './widgets/driver_info_card_widget.dart';
-import './widgets/sos_button_widget.dart';
 import './widgets/tracking_map_widget_io.dart';
 import './widgets/trip_details_panel_widget.dart';
 

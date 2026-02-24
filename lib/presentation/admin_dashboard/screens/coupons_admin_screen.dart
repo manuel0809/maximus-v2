@@ -22,6 +22,7 @@ class _CouponsAdminScreenState extends State<CouponsAdminScreen> {
 
   Future<void> _loadCoupons() async {
     setState(() => _isLoading = true);
+    final messenger = ScaffoldMessenger.of(context);
     try {
       final coupons = await _loyaltyService.getAvailableCoupons();
       setState(() {
@@ -29,30 +30,28 @@ class _CouponsAdminScreenState extends State<CouponsAdminScreen> {
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => _isLoading = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al cargar cupones: $e')),
-        );
-      }
+      messenger.showSnackBar(
+        SnackBar(content: Text('Error al cargar cupones: $e')),
+      );
     }
   }
 
   Future<void> _deleteCoupon(String id) async {
+    final messenger = ScaffoldMessenger.of(context);
     try {
       await _loyaltyService.deleteCoupon(id);
       _loadCoupons();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Cupón eliminado con éxito')),
-        );
-      }
+      if (!mounted) return;
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Cupón eliminado con éxito')),
+      );
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
     }
   }
 

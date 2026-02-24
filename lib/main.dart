@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:sizer/sizer.dart';
+import './routes/app_routes.dart';
+import './services/localization_service.dart';
+import './services/notification_service.dart';
+import './services/realtime_service.dart';
 
-// ==========================================
-// 1. CAPA DE INICIALIZACIÓN
-// ==========================================
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  
-  await Supabase.initialize(
-    url: 'https://zeirkcjvddvkugpsxtit.supabase.co', 
-    anonKey: 'sb_publishable_z1A-bV02S3qAC5Upm09DNg_0A8f499m',
-  );
-
+void main() {
   runApp(const MaximusApp());
 }
 
@@ -20,167 +16,146 @@ class MaximusApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Maximus Level Group',
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        primaryColor: const Color(0xFFD4AF37), // Dorado Premium
-        scaffoldBackgroundColor: Colors.black,
-      ),
-      home: const LuxuryLandingPage(),
+    return Sizer(
+      builder: (context, orientation, deviceType) {
+        return MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => LocalizationService()),
+            Provider(create: (_) => NotificationService.instance),
+            Provider(create: (_) => RealtimeService.instance),
+          ],
+          child: MaterialApp(
+            title: 'Maximus level group',
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              brightness: Brightness.dark,
+              primaryColor: const Color(0xFFD4AF37),
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: const Color(0xFFD4AF37),
+                brightness: Brightness.dark,
+                primary: const Color(0xFFD4AF37),
+                onPrimary: Colors.black,
+              ),
+            ),
+            initialRoute: AppRoutes.initial,
+            routes: {
+              ...AppRoutes.routes,
+              '/login-premium': (context) => const LoginPremiumScreen(),
+            },
+            // Temporarily use LoginPremiumScreen as initial if needed, 
+            // but SplashScreen usually handles this.
+            home: const LoginPremiumScreen(),
+          ),
+        );
+      },
     );
   }
 }
 
-// ==========================================
-// 2. CAPA DE PRESENTACIÓN (UI)
-// ==========================================
-class LuxuryLandingPage extends StatefulWidget {
-  const LuxuryLandingPage({super.key});
-
-  @override
-  State<LuxuryLandingPage> createState() => _LuxuryLandingPageState();
-}
-
-class _LuxuryLandingPageState extends State<LuxuryLandingPage> {
-  // Controladores de texto
-  final _nameController = TextEditingController();
-  final _pickupController = TextEditingController();
-  final _dropoffController = TextEditingController();
-
-  // ==========================================
-  // 3. CAPA DE LÓGICA (BUSINESS LOGIC)
-  // ==========================================
-  Future<void> _processBooking() async {
-    // Validación simple
-    if (_nameController.text.isEmpty || _pickupController.text.isEmpty) {
-      _showNotification("Por favor, complete los campos obligatorios", isError: true);
-      return;
-    }
-
-    try {
-      await Supabase.instance.client.from('reservas').insert({
-        'texto del nombre del cliente': _nameController.text,
-        'texto de la dirección de recogida': _pickupController.text,
-        'texto de la dirección de destino': _dropoffController.text,
-        'texto de estado': 'Pendiente de Contacto',
-      });
-
-      _showNotification("Solicitud de lujo enviada. Maximus le contactará en breve.");
-      _clearFields();
-    } catch (e) {
-      _showNotification("Error de red. Intente de nuevo.", isError: true);
-    }
-  }
-
-  void _showNotification(String msg, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(msg, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        backgroundColor: isError ? Colors.red : const Color(0xFFD4AF37),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
-  void _clearFields() {
-    _nameController.clear();
-    _pickupController.clear();
-    _dropoffController.clear();
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _pickupController.dispose();
-    _dropoffController.dispose();
-    super.dispose();
-  }
+class LoginPremiumScreen extends StatelessWidget {
+  const LoginPremiumScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          // Capa de Fondo (Imagen de alta resolución)
+          // 1. FONDO: Imagen de Suburban en Miami de Noche
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: NetworkImage('https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=2000'), // Imagen de auto de lujo
+                image: NetworkImage('https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=2000'),
                 fit: BoxFit.cover,
               ),
             ),
           ),
-          // Capa de Gradiente (Efecto cine)
+          // Premium Gradient Overlay for visual depth and text legibility
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.black.withOpacity(0.9), Colors.transparent],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withValues(red: 0, green: 0, blue: 0, alpha: 0.2),
+                  Colors.black.withValues(red: 0, green: 0, blue: 0, alpha: 0.6),
+                  Colors.black,
+                ],
+                stops: const [0.0, 0.4, 1.0],
               ),
             ),
           ),
-          // Capa de Contenido
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 80),
-            child: Row(
-              children: [
-                // Lado Izquierdo: Branding
-                Expanded(
-                  flex: 2,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text("MAXIMUS", 
-                        style: TextStyle(color: Color(0xFFD4AF37), fontSize: 90, letterSpacing: 25, fontWeight: FontWeight.w100)),
-                      const Text("LEVEL GROUP", 
-                        style: TextStyle(color: Colors.white, fontSize: 18, letterSpacing: 10)),
-                      const SizedBox(height: 40),
-                      const Text("REDEFINING\nEXCLUSIVITY", 
-                        style: TextStyle(color: Colors.white, fontSize: 50, fontWeight: FontWeight.bold, height: 1.1)),
-                      const SizedBox(height: 30),
-                      Container(height: 3, width: 80, color: const Color(0xFFD4AF37)),
-                    ],
-                  ),
-                ),
-                // Lado Derecho: Formulario "Glass"
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(40),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.3)),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text("REQUEST CHAUFFEUR", style: TextStyle(letterSpacing: 3, fontWeight: FontWeight.bold, color: Colors.white)),
-                        const SizedBox(height: 30),
-                        _luxuryField(_nameController, "FULL NAME", Icons.person_outline),
-                        const SizedBox(height: 20),
-                        _luxuryField(_pickupController, "PICKUP LOCATION", Icons.location_on_outlined),
-                        const SizedBox(height: 20),
-                        _luxuryField(_dropoffController, "DESTINATION", Icons.flag_outlined),
-                        const SizedBox(height: 40),
-                        ElevatedButton(
-                          onPressed: _processBooking,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFD4AF37),
-                            foregroundColor: Colors.black,
-                            minimumSize: const Size(double.infinity, 60),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                          ),
-                          child: const Text("BOOK NOW", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                        ),
+
+          // 3. CONTENIDO
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: Column(
+                children: [
+                  const SizedBox(height: 60),
+                  
+                  // NOMBRE DE LA COMPAÑÍA EN 3D (Efecto Gold & Shadows)
+                  Text(
+                    "MAXIMUS\nLEVEL GROUP",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.cinzel( // Fuente muy elegante/exclusiva
+                      fontSize: 48,
+                      fontWeight: FontWeight.w900,
+                      height: 1.0,
+                      color: const Color(0xFFD4AF37), // Color Oro
+                      shadows: [
+                        const Shadow(offset: Offset(3, 3), blurRadius: 8, color: Colors.black),
+                        const Shadow(offset: Offset(-1, -1), blurRadius: 2, color: Colors.white24),
                       ],
                     ),
                   ),
-                ),
-              ],
+                  
+                  const SizedBox(height: 20),
+                  
+                  // SLOGAN EN BLANCO (Más pequeño y limpio)
+                  Text(
+                    "Premium Ride Experience",
+                    style: GoogleFonts.lexend(
+                      fontSize: 18,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w300,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+
+                  const Spacer(),
+
+                  // BOTÓN DE LOGIN PRINCIPAL
+                  _buildMainButton(context, "Login", Colors.white, Colors.black, () {
+                    Navigator.pushNamed(context, AppRoutes.clientDashboard);
+                  }),
+                  
+                  const SizedBox(height: 15),
+
+                  // BOTÓN APPLE
+                  _buildSocialButton(context, "Continue with Apple", Icons.apple, Colors.white, () {
+                    Navigator.pushNamed(context, AppRoutes.clientDashboard);
+                  }),
+                  
+                  const SizedBox(height: 12),
+
+                  // BOTÓN GOOGLE
+                  _buildSocialButton(context, "Continue with Google", Icons.g_mobiledata, Colors.white, () {
+                    Navigator.pushNamed(context, AppRoutes.clientDashboard);
+                  }),
+
+                  const SizedBox(height: 15),
+
+                  const SizedBox(height: 30),
+
+                  // TEXTO FINAL
+                  Text(
+                    "or create an account manually",
+                    style: GoogleFonts.lexend(color: Colors.white54, fontSize: 14),
+                  ),
+                  
+                  const SizedBox(height: 20),
+                ],
+              ),
             ),
           ),
         ],
@@ -188,17 +163,63 @@ class _LuxuryLandingPageState extends State<LuxuryLandingPage> {
     );
   }
 
-  Widget _luxuryField(TextEditingController controller, String label, IconData icon) {
-    return TextField(
-      controller: controller,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Colors.white54, fontSize: 12),
-        prefixIcon: Icon(icon, color: const Color(0xFFD4AF37)),
-        enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
-        focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFFD4AF37))),
+  // WIDGETS AUXILIARES PARA LOS BOTONES
+  Widget _buildMainButton(BuildContext context, String text, Color bg, Color txt, VoidCallback onTap) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(30),
+        child: Container(
+          width: double.infinity,
+          height: 55,
+          decoration: BoxDecoration(
+            color: bg,
+            borderRadius: BorderRadius.circular(30),
+            boxShadow: [BoxShadow(color: Colors.black.withValues(red: 0, green: 0, blue: 0, alpha: 0.3), blurRadius: 10, offset: const Offset(0, 5))],
+          ),
+          child: Center(
+            child: Text(text, style: GoogleFonts.lexend(color: txt, fontWeight: FontWeight.bold, fontSize: 16)),
+          ),
+        ),
       ),
     );
+  }
+
+  Widget _buildSocialButton(BuildContext context, String text, IconData icon, Color color, VoidCallback onTap) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(30),
+        child: Container(
+          width: double.infinity,
+          height: 55,
+            decoration: BoxDecoration(
+            color: Colors.white.withValues(red: 1, green: 1, blue: 1, alpha: 0.1), // Estilo Glassmorphism
+            borderRadius: BorderRadius.circular(30),
+            border: Border.all(color: Colors.white24),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: color, size: 28),
+              const SizedBox(width: 10),
+              Text(text, style: GoogleFonts.lexend(color: color, fontSize: 16)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Backwards-compatible alias for tests that expect `MyApp`.
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaximusApp();
   }
 }

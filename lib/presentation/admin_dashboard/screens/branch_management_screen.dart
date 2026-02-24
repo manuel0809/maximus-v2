@@ -108,15 +108,15 @@ class _BranchManagementScreenState extends State<BranchManagementScreen> {
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
           ElevatedButton(
             onPressed: () async {
+              final dialogNavigator = Navigator.of(context);
               await _branchService.createBranch({
                 'name': nameController.text,
                 'address': addressController.text,
                 'created_at': DateTime.now().toIso8601String(),
               });
-              if (mounted) {
-                Navigator.pop(context);
-                _loadBranches();
-              }
+              if (!mounted) return;
+              dialogNavigator.pop();
+              _loadBranches();
             },
             child: const Text('Guardar'),
           ),

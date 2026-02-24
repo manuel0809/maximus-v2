@@ -79,7 +79,7 @@ class _CarRentalServiceScreenState extends State<CarRentalServiceScreen> {
       }
 
       Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
       );
 
       setState(() {

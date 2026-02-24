@@ -204,8 +204,11 @@ class _AdminUserManagementScreenState extends State<AdminUserManagementScreen> {
 
     showDialog(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
+            builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          final dialogNavigator = Navigator.of(context);
+          final dialogMessenger = ScaffoldMessenger.of(context);
+          return AlertDialog(
           title: const Text('Crear Nuevo Usuario'),
           content: Form(
             key: formKey,
@@ -231,7 +234,7 @@ class _AdminUserManagementScreenState extends State<AdminUserManagementScreen> {
                   ),
                   SizedBox(height: 2.h),
                   DropdownButtonFormField<String>(
-                    value: selectedRole,
+                    initialValue: selectedRole,
                     decoration: const InputDecoration(labelText: 'Rol Inicial', prefixIcon: Icon(Icons.admin_panel_settings)),
                     items: const [
                       DropdownMenuItem(value: 'client', child: Text('Cliente')),
@@ -245,16 +248,13 @@ class _AdminUserManagementScreenState extends State<AdminUserManagementScreen> {
               ),
             ),
           ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+            actions: [
+            TextButton(onPressed: () => dialogNavigator.pop(), child: const Text('Cancelar')),
             ElevatedButton(
               onPressed: isCreating ? null : () async {
                 if (formKey.currentState!.validate()) {
                   setState(() => isCreating = true);
                   try {
-                    // Note: This creates the profile. Real auth creation requires Flow/Edge Function
-                    // Using AppRole extension helper if available, otherwise just string 
-                    // Manual string to AppRole conversion for safety
                     AppRole roleEnum = AppRole.client;
                     if (selectedRole == 'driver') roleEnum = AppRole.driver;
                     if (selectedRole == 'assistant') roleEnum = AppRole.assistant;
@@ -266,21 +266,22 @@ class _AdminUserManagementScreenState extends State<AdminUserManagementScreen> {
                       phone: phoneController.text.trim(),
                       role: roleEnum,
                     );
-                    if (mounted) {
-                      Navigator.pop(context);
-                      _loadUsers();
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Usuario creado (Perfil). Solicite al usuario registrarse con este email.')));
-                    }
+                    if (!mounted) return;
+                    dialogNavigator.pop();
+                    _loadUsers();
+                    dialogMessenger.showSnackBar(const SnackBar(content: Text('Usuario creado (Perfil). Solicite al usuario registrarse con este email.')));
                   } catch (e) {
+                    if (!mounted) return;
                     setState(() => isCreating = false);
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                    dialogMessenger.showSnackBar(SnackBar(content: Text('Error: $e')));
                   }
                 }
               },
               child: isCreating ? const CircularProgressIndicator(color: Colors.white) : const Text('Crear'),
             ),
           ],
-        ),
+        );
+        }
       ),
     );
   }
@@ -288,29 +289,31 @@ class _AdminUserManagementScreenState extends State<AdminUserManagementScreen> {
   void _showResetPasswordDialog(Map<String, dynamic> user) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Restablecer Contraseña'),
-        content: Text('¿Enviar correo de recuperación a ${user['email']}?'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              try {
-                await _userService.sendPasswordResetEmail(user['email']);
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Correo enviado correctamente')));
+      builder: (context) {
+        final dialogNavigator = Navigator.of(context);
+        final dialogMessenger = ScaffoldMessenger.of(context);
+        return AlertDialog(
+          title: const Text('Restablecer Contraseña'),
+          content: Text('¿Enviar correo de recuperación a ${user['email']}?'),
+          actions: [
+            TextButton(onPressed: () => dialogNavigator.pop(), child: const Text('Cancelar')),
+            TextButton(
+              onPressed: () async {
+                dialogNavigator.pop();
+                try {
+                  await _userService.sendPasswordResetEmail(user['email']);
+                  if (!mounted) return;
+                  dialogMessenger.showSnackBar(const SnackBar(content: Text('Correo enviado correctamente')));
+                } catch (e) {
+                  if (!mounted) return;
+                  dialogMessenger.showSnackBar(SnackBar(content: Text('Error: $e')));
                 }
-              } catch (e) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
-                }
-              }
-            },
-            child: const Text('Enviar'),
-          ),
-        ],
-      ),
+              },
+              child: const Text('Enviar'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -321,7 +324,10 @@ class _AdminUserManagementScreenState extends State<AdminUserManagementScreen> {
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
+        builder: (context, setState) {
+          final dialogNavigator = Navigator.of(context);
+          final dialogMessenger = ScaffoldMessenger.of(context);
+          return AlertDialog(
           title: const Text('Cambiar Rol de Usuario'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -329,7 +335,7 @@ class _AdminUserManagementScreenState extends State<AdminUserManagementScreen> {
               Text('Usuario: ${user['full_name']}'),
               SizedBox(height: 2.h),
               DropdownButtonFormField<String>(
-                value: UserService.validRoles.contains(selectedRole) ? selectedRole : 'client',
+                initialValue: UserService.validRoles.contains(selectedRole) ? selectedRole : 'client',
                 items: UserService.validRoles.map((role) {
                   return DropdownMenuItem(value: role, child: Text(role.toUpperCase()));
                 }).toList(),
@@ -338,26 +344,27 @@ class _AdminUserManagementScreenState extends State<AdminUserManagementScreen> {
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+            TextButton(onPressed: () => dialogNavigator.pop(), child: const Text('Cancelar')),
             ElevatedButton(
               onPressed: isLoading ? null : () async {
                 setState(() => isLoading = true);
                 try {
                   await _userService.updateUserRoleByString(user['id'], selectedRole);
-                  if (mounted) {
-                    Navigator.pop(context);
-                    _loadUsers();
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Rol actualizado')));
-                  }
+                  if (!mounted) return;
+                  dialogNavigator.pop();
+                  _loadUsers();
+                  dialogMessenger.showSnackBar(const SnackBar(content: Text('Rol actualizado')));
                 } catch (e) {
+                  if (!mounted) return;
                   setState(() => isLoading = false);
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                  dialogMessenger.showSnackBar(SnackBar(content: Text('Error: $e')));
                 }
               },
               child: const Text('Guardar'),
             ),
           ],
-        ),
+        );
+        }
       ),
     );
   }
@@ -370,29 +377,33 @@ class _AdminUserManagementScreenState extends State<AdminUserManagementScreen> {
   void _confirmApproval(Map<String, dynamic> user) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) {
+        final dialogNavigator = Navigator.of(context);
+        final dialogMessenger = ScaffoldMessenger.of(context);
+        return AlertDialog(
         title: const Text('Aprobar Usuario'),
         content: Text('¿Desea activar la cuenta de ${user['full_name']}?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+          TextButton(onPressed: () => dialogNavigator.pop(), child: const Text('Cancelar')),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2E7D32)),
             onPressed: () async {
-               Navigator.pop(context);
+               dialogNavigator.pop();
                try {
                  await _userService.updateUserStatus(user['id'], true);
+                 if (!mounted) return;
                  _loadUsers();
-                 if (mounted) {
-                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Usuario aprobado y activado')));
-                 }
+                 dialogMessenger.showSnackBar(const SnackBar(content: Text('Usuario aprobado y activado')));
                } catch (e) {
-                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                 if (!mounted) return;
+                 dialogMessenger.showSnackBar(SnackBar(content: Text('Error: $e')));
                }
             },
             child: const Text('Aprobar', style: TextStyle(color: Colors.white)),
           ),
         ],
-      ),
+      );
+      },
     );
   }
 }

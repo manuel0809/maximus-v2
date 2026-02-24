@@ -1,5 +1,6 @@
 
 import 'package:supabase/supabase.dart';
+import 'package:flutter/foundation.dart';
 
 void main() async {
   const supabaseUrl = 'https://metapwzflvslnivcsedu.supabase.co';
@@ -11,7 +12,7 @@ void main() async {
   final password = 'M@nuel08'; // Using the same password as the admin account
 
   try {
-    print('Attempts to create user: $email...');
+    debugPrint('Attempts to create user: $email...');
     
     final response = await supabase.auth.signUp(
       email: email,
@@ -24,18 +25,18 @@ void main() async {
 
     if (response.user != null) {
       if (response.user!.identities != null && response.user!.identities!.isNotEmpty) {
-        print('✅ User $email created successfully!');
-        print('Password: $password');
-        print('Please try logging in with these credentials.');
+        debugPrint('✅ User $email created successfully!');
+        debugPrint('Password: $password');
+        debugPrint('Please try logging in with these credentials.');
       } else {
-        print('⚠️ User $email already exists (or requires email confirmation).');
-        print('If it exists, please use the correct password.');
-        print('Alternatively, try logging in with: admin@maximuslevelgroup.com / M@nuel08');
+        debugPrint('⚠️ User $email already exists (or requires email confirmation).');
+        debugPrint('If it exists, please use the correct password.');
+        debugPrint('Alternatively, try logging in with: admin@maximuslevelgroup.com / M@nuel08');
       }
     } else {
-      print('⚠️ Unexpected response (User is null).');
+      debugPrint('⚠️ Unexpected response (User is null).');
     }
-  } catch (e) {
-    print('❌ Error: $e');
+    } catch (e) {
+    debugPrint('❌ Error: $e');
   }
 }

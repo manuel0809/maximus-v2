@@ -11,7 +11,6 @@ import './widgets/transport_pricing_widget.dart';
 import '../../widgets/mapbox_location_picker_widget.dart';
 import '../../widgets/premium_card.dart';
 import '../../services/hourly_service.dart';
-import 'package:intl/intl.dart';
 
 class PersonalTransportServiceScreen extends StatefulWidget {
   const PersonalTransportServiceScreen({super.key});
