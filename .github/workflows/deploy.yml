@@ -16,7 +16,8 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          cache: true # Enable internal caching for flutter-action
+          flutter-version: '3.29.0' # Explicitly use a very recent version
+          cache: true
 
       - name: 📦 Cache Pub Dependencies
         uses: actions/cache@v4
@@ -33,7 +34,7 @@ jobs:
         run: flutter analyze
 
       - name: 🏗️ Build Web
-        run: flutter build web --release --web-renderer auto --base-href /
+        run: flutter build web --release --base-href /
 
       - name: 🚀 Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
