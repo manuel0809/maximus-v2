@@ -51,7 +51,6 @@ class _TrackingMapWidgetState extends State<TrackingMapWidget>
   PointAnnotationManager? _pointAnnotationManager;
   PolylineAnnotationManager? _polylineAnnotationManager;
   PointAnnotation? _driverAnnotation;
-  PointAnnotation? _pickupAnnotation;
   PolylineAnnotation? _routePolyline;
 
   @override
@@ -119,7 +118,7 @@ class _TrackingMapWidgetState extends State<TrackingMapWidget>
 
     final pickupIcon = await _createPickupIconBitmap();
 
-    _pickupAnnotation = await _pointAnnotationManager!.create(
+    await _pointAnnotationManager!.create(
       PointAnnotationOptions(
         geometry: Point(
           coordinates: Position(widget.pickupLng, widget.pickupLat),
@@ -274,30 +273,6 @@ class _TrackingMapWidgetState extends State<TrackingMapWidget>
 
   void _updateCameraBounds() async {
     if (_mapboxMap == null || !mounted) return;
-
-    final bounds = CoordinateBounds(
-      southwest: Point(
-        coordinates: Position(
-          widget.driverLng < widget.pickupLng
-              ? widget.driverLng
-              : widget.pickupLng,
-          widget.driverLat < widget.pickupLat
-              ? widget.driverLat
-              : widget.pickupLat,
-        ),
-      ),
-      northeast: Point(
-        coordinates: Position(
-          widget.driverLng > widget.pickupLng
-              ? widget.driverLng
-              : widget.pickupLng,
-          widget.driverLat > widget.pickupLat
-              ? widget.driverLat
-              : widget.pickupLat,
-        ),
-      ),
-      infiniteBounds: false,
-    );
 
     await _mapboxMap!.setCamera(
       CameraOptions(

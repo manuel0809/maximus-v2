@@ -208,15 +208,19 @@ class _FleetManagementScreenState extends State<FleetManagementScreen> {
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
           ElevatedButton(
             onPressed: () async {
-              Navigator.pop(context);
+              final navigator = Navigator.of(context);
+              final messenger = ScaffoldMessenger.of(context);
+              navigator.pop();
               setState(() => isLoading = true);
               try {
                 await _carService.deleteVehicle(vehicle['id']);
                 _loadVehicles();
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vehículo eliminado con éxito')));
+                if (!mounted) return;
+                messenger.showSnackBar(const SnackBar(content: Text('Vehículo eliminado con éxito')));
               } catch (e) {
+                if (!mounted) return;
                 setState(() => isLoading = false);
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                messenger.showSnackBar(SnackBar(content: Text('Error: $e')));
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),

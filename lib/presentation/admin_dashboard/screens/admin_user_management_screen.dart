@@ -90,7 +90,6 @@ class _AdminUserManagementScreenState extends State<AdminUserManagementScreen> {
 
   Widget _buildUserCard(ThemeData theme, Map<String, dynamic> user) {
     final role = user['role'] ?? 'client';
-    final level = user['membership_level'] as String? ?? 'Bronce';
     
     return PremiumCard(
       padding: EdgeInsets.all(4.w),

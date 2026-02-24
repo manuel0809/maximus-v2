@@ -16,7 +16,6 @@ class PaymentStatisticsWidget extends StatelessWidget {
     final totalSpent = (statistics['total_spent'] as num?)?.toDouble() ?? 0;
     final completedTotal =
         (statistics['completed_total'] as num?)?.toDouble() ?? 0;
-    final completedCount = statistics['completed_count'] as int? ?? 0;
     final pendingCount = statistics['pending_count'] as int? ?? 0;
     final totalTransactions = statistics['total_transactions'] as int? ?? 0;
     final serviceTypeBreakdown =

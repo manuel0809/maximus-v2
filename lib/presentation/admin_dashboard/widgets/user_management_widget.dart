@@ -137,6 +137,9 @@ class _UserManagementWidgetState extends State<UserManagementWidget> {
               onPressed: () async {
                 if (nameController.text.isEmpty || emailController.text.isEmpty) return;
                 
+                final navigator = Navigator.of(context);
+                final messenger = ScaffoldMessenger.of(context);
+
                 try {
                   await _userService.createUser(
                     email: emailController.text.trim(),
@@ -145,7 +148,7 @@ class _UserManagementWidgetState extends State<UserManagementWidget> {
                     role: AppRole.fromString(selectedRole),
                     // Assuming we'll extend createUser or handle phone separately
                   );
-                  
+
                   if (sendWhatsApp && phoneController.text.isNotEmpty) {
                     await WhatsAppService.instance.sendInvitation(
                       userPhone: phoneController.text.trim(),
@@ -155,17 +158,17 @@ class _UserManagementWidgetState extends State<UserManagementWidget> {
                     );
                   }
 
-                  if (mounted) {
-                    Navigator.pop(context);
-                    _loadUsers();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Usuario registrado correctamente')),
-                    );
-                  }
+                  if (!mounted) return;
+                  navigator.pop();
+                  _loadUsers();
+                  messenger.showSnackBar(
+                    const SnackBar(content: Text('Usuario registrado correctamente')),
+                  );
                 } catch (e) {
-                   ScaffoldMessenger.of(context).showSnackBar(
-                     SnackBar(content: Text(e.toString())),
-                   );
+                  if (!mounted) return;
+                  messenger.showSnackBar(
+                    SnackBar(content: Text(e.toString())),
+                  );
                 }
               },
               child: const Text('Registrar'),

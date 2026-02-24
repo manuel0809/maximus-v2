@@ -5,15 +5,9 @@ import '../../core/app_export.dart';
 import '../../services/notification_service.dart';
 import '../../services/realtime_service.dart';
 import '../../widgets/custom_app_bar.dart';
-import './widgets/analytics_chart_widget.dart';
 import './widgets/booking_request_card_widget.dart';
-import './widgets/document_review_widget.dart';
-import './widgets/driver_contacts_management_widget.dart';
-import './widgets/fleet_alerts_widget.dart';
-import './widgets/kpi_card_widget.dart';
 import './widgets/pricing_config_modal_widget.dart';
 import './widgets/service_control_widget.dart';
-import './widgets/user_management_widget.dart';
 import './screens/financial_reports_screen.dart';
 import './screens/advanced_analytics_screen.dart';
 import './screens/admin_user_management_screen.dart';
@@ -490,69 +484,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
       case 'Usuarios':
         return AdminUserManagementScreen();
       case 'Settings':
-        return _buildSettingsSection();
+        return const Center(child: Text('Configuración del Sistema'));
       default:
         return const AdminSummaryDashboardScreen();
     }
   }
 
-  Widget _buildSummarySection() {
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(4.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Resumen General',
-            style: Theme.of(
-              context,
-            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w600),
-          ),
-          SizedBox(height: 2.h),
-          _buildKPISection(),
-          SizedBox(height: 3.h),
-          _buildAnalyticsSection(),
-          SizedBox(height: 3.h),
-          // Show recent bookings across all services in summary
-          _buildBookingManagementSection(title: 'Reservas Recientes'),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildCarRentalSection() {
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(4.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Gestión de Renta de Autos',
-            style: Theme.of(
-              context,
-            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w600),
-          ),
-          SizedBox(height: 2.h),
-          const FleetAlertsWidget(),
-          SizedBox(height: 3.h),
-          _buildBookingManagementSection(
-            title: 'Reservas de Autos',
-            serviceCategory: 'CarRental',
-          ),
-          SizedBox(height: 3.h),
-          Text(
-            'Control de Flota',
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
-          ),
-          SizedBox(height: 2.h),
-          // Filtered service control for car rental
-          _buildServiceControlsSection(serviceNameFilter: 'Alquiler de Coches'),
-        ],
-      ),
-    );
-  }
 
   Widget _buildPersonalTransportSection() {
     return SingleChildScrollView(
@@ -594,24 +532,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
-  Widget _buildSettingsSection() {
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(4.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Configuración del Sistema',
-            style: Theme.of(
-              context,
-            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w600),
-          ),
-          SizedBox(height: 3.h),
-          const DriverContactsManagementWidget(),
-        ],
-      ),
-    );
-  }
+
 
   Widget _buildBlackPricingConfigList() {
     return Column(
@@ -630,30 +551,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
-  Widget _buildKPISection() {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 3.w,
-        mainAxisSpacing: 2.h,
-        childAspectRatio: 1.5,
-      ),
-      itemCount: kpiData.length,
-      itemBuilder: (context, index) {
-        final kpi = kpiData[index];
-        return KPICardWidget(
-          title: kpi['title'] as String,
-          value: kpi['value'] as String,
-          icon: kpi['icon'] as String,
-          color: kpi['color'] as Color,
-          change: kpi['change'] as String?,
-          isPositive: kpi['isPositive'] as bool? ?? true,
-        );
-      },
-    );
-  }
+
 
   Widget _buildBookingManagementSection({
     String title = 'Gestión de Reservas',
@@ -775,21 +673,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
-  Widget _buildAnalyticsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Análisis y Tendencias',
-          style: Theme.of(
-            context,
-          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
-        ),
-        SizedBox(height: 2.h),
-        const AnalyticsChartWidget(),
-      ],
-    );
-  }
+
 
   Widget _buildServiceControlsSection({
     String? serviceNameFilter,
@@ -828,60 +712,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
-  Widget _buildDriverContactsContent() {
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(3.w),
-      child: const DriverContactsManagementWidget(),
-    );
-  }
 
-  Widget _buildUserManagementSection() {
-    return Padding(
-      padding: EdgeInsets.all(4.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              _buildTabButton('Gestión', !showDocumentReview),
-              SizedBox(width: 4.w),
-              _buildTabButton('Verificación', showDocumentReview),
-            ],
-          ),
-          SizedBox(height: 3.h),
-          Expanded(
-            child: showDocumentReview
-                ? const DocumentReviewWidget()
-                : const UserManagementWidget(),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildTabButton(String label, bool isSelected) {
-    return GestureDetector(
-      onTap: () => setState(() => showDocumentReview = label == 'Verificación'),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: isSelected ? const Color(0xFF8B1538) : Colors.transparent,
-              width: 2,
-            ),
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? const Color(0xFF8B1538) : Colors.grey,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          ),
-        ),
-      ),
-    );
-  }
+
+
+
 
   void _handleBookingAction(Map<String, dynamic> booking, String action) {
     String message = '';
@@ -1001,13 +836,5 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
-  void _onSidebarItemTap(String section) {
-    if (section == 'CarRental') {
-      Navigator.pushNamed(context, AppRoutes.carRentalAdminPanel);
-    } else {
-      setState(() {
-        selectedSection = section;
-      });
-    }
-  }
+
 }

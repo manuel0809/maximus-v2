@@ -132,6 +132,9 @@ class _DriverContactsManagementWidgetState
                       return;
                     }
 
+                    final navigator = Navigator.of(context);
+                    final messenger = ScaffoldMessenger.of(context);
+
                     try {
                       await _adminService.saveDriverContact(
                         driverId: selectedDriverId!,
@@ -141,26 +144,19 @@ class _DriverContactsManagementWidgetState
                             ? null
                             : notesController.text.trim(),
                       );
-
-                      if (mounted) {
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              isEdit
-                                  ? 'Contacto actualizado'
-                                  : 'Contacto agregado',
-                            ),
+                      if (!mounted) return;
+                      navigator.pop();
+                      messenger.showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            isEdit ? 'Contacto actualizado' : 'Contacto agregado',
                           ),
-                        );
-                        _loadData();
-                      }
+                        ),
+                      );
+                      _loadData();
                     } catch (e) {
-                      if (mounted) {
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(SnackBar(content: Text('Error: $e')));
-                      }
+                      if (!mounted) return;
+                      messenger.showSnackBar(SnackBar(content: Text('Error: $e')));
                     }
                   },
                   child: Text(isEdit ? 'Actualizar' : 'Agregar'),

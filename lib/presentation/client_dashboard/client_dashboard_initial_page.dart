@@ -351,7 +351,6 @@ class _ClientDashboardInitialPageState
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return Consumer<LocalizationService>(
       builder: (context, localization, child) {
@@ -543,57 +542,7 @@ class _ClientDashboardInitialPageState
     );
   }
 
-  Widget _buildLocationRow(ThemeData theme) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.2.h),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.03),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: const Color(0xFFD4AF37).withValues(alpha: 0.15),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.location_on, color: Color(0xFFD4AF37), size: 14),
-          ),
-          SizedBox(width: 2.w),
-          isLoadingLocation
-              ? SizedBox(
-                  width: 12,
-                  height: 12,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2, 
-                    valueColor: AlwaysStoppedAnimation(const Color(0xFFD4AF37)),
-                  ),
-                )
-              : Text(
-                  currentLocation,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.7),
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildHeader(ThemeData theme, LocalizationService localization) {
-    return const SizedBox.shrink(); // Replaced by _buildLuxuryHeader
-  }
 
   Widget _buildServicesSection(
     ThemeData theme,

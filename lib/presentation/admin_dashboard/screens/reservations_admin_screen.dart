@@ -183,31 +183,33 @@ class _ReservationsAdminScreenState extends State<ReservationsAdminScreen> {
             TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
             ElevatedButton(
               onPressed: () async {
-                try {
-                  if (serviceType == 'Rental') {
-                    // Manual override: we'd ideally pass the userId to createRental
-                    // For now, let's simulate the entry in the DB
-                    await _carService.createRental(
-                      vehicleId: selectedVehicleId,
-                      pickupDate: pickupDate,
-                      dropoffDate: dropoffDate,
-                      pickupLocation: 'Oficina Central',
-                      dropoffLocation: 'Oficina Central',
-                      pricePerDay: (vehicles.firstWhere((v) => v['id'] == selectedVehicleId)['price_per_day'] ?? 100).toDouble(),
-                    );
-                  }
-                  if (context.mounted) {
-                    Navigator.pop(context);
+                  final navigator = Navigator.of(context);
+                  final messenger = ScaffoldMessenger.of(context);
+                  try {
+                    if (serviceType == 'Rental') {
+                      // Manual override: we'd ideally pass the userId to createRental
+                      // For now, let's simulate the entry in the DB
+                      await _carService.createRental(
+                        vehicleId: selectedVehicleId,
+                        pickupDate: pickupDate,
+                        dropoffDate: dropoffDate,
+                        pickupLocation: 'Oficina Central',
+                        dropoffLocation: 'Oficina Central',
+                        pricePerDay: (vehicles.firstWhere((v) => v['id'] == selectedVehicleId)['price_per_day'] ?? 100).toDouble(),
+                      );
+                    }
+                    if (!mounted) return;
+                    navigator.pop();
                     _loadRentals();
-                    ScaffoldMessenger.of(context).showSnackBar(
+                    messenger.showSnackBar(
                       const SnackBar(content: Text('Reserva creada con éxito')),
                     );
+                  } catch (e) {
+                    if (!mounted) return;
+                    messenger.showSnackBar(
+                      SnackBar(content: Text('Error: $e')),
+                    );
                   }
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error: $e')),
-                  );
-                }
               },
               child: const Text('Crear Reserva'),
             ),

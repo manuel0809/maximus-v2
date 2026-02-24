@@ -56,6 +56,7 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
   }
 
   Future<void> _handleTripAction(String tripId, String status) async {
+    final messenger = ScaffoldMessenger.of(context);
     try {
       final driverId = Supabase.instance.client.auth.currentUser?.id;
       await _tripService.updateTripStatus(
@@ -63,9 +64,11 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
         status: status,
         driverId: status == 'scheduled' ? driverId : null, // Using scheduled with driver_id as 'Accepted'
       );
+      if (!mounted) return;
       _loadTrips();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      if (!mounted) return;
+      messenger.showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 

@@ -95,24 +95,26 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen> {
             TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
             ElevatedButton(
               onPressed: () async {
-                if (amountController.text.isEmpty) return;
-                try {
-                  await _financeService.addExpense(
-                    vehicleId: selectedVehicleId,
-                    type: selectedType,
-                    amount: double.parse(amountController.text),
-                    description: descController.text,
-                    date: DateTime.now(),
-                  );
-                  if (context.mounted) {
-                    Navigator.pop(context);
+                  if (amountController.text.isEmpty) return;
+                  final navigator = Navigator.of(context);
+                  final messenger = ScaffoldMessenger.of(context);
+                  try {
+                    await _financeService.addExpense(
+                      vehicleId: selectedVehicleId,
+                      type: selectedType,
+                      amount: double.parse(amountController.text),
+                      description: descController.text,
+                      date: DateTime.now(),
+                    );
+                    if (!mounted) return;
+                    navigator.pop();
                     _loadFinanceData();
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gasto registrado exitosamente')));
+                    messenger.showSnackBar(const SnackBar(content: Text('Gasto registrado exitosamente')));
+                  } catch (e) {
+                    if (!mounted) return;
+                    messenger.showSnackBar(SnackBar(content: Text('Error: $e')));
                   }
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
-                }
-              },
+                },
               child: const Text('Guardar'),
             ),
           ],

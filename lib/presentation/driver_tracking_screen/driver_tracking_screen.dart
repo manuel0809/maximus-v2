@@ -128,61 +128,7 @@ class _DriverTrackingScreenState extends State<DriverTrackingScreen> {
     );
   }
 
-  void _handleSOSPressed() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            const Icon(Icons.warning, color: Colors.red, size: 32),
-            SizedBox(width: 2.w),
-            const Text('Alerta de Emergencia'),
-          ],
-        ),
-        content: const Text(
-          '¿Deseas activar el botón de emergencia SOS?\n\nEsto alertará inmediatamente a:\n• Servicios de emergencia\n• Despacho de la compañía\n• Tus contactos de emergencia',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _activateSOSAlert();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Activar SOS'),
-          ),
-        ],
-      ),
-    );
-  }
 
-  void _activateSOSAlert() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Row(
-          children: [
-            Icon(Icons.check_circle, color: Colors.white),
-            SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'Alerta SOS activada. Ayuda en camino.',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.red,
-        duration: const Duration(seconds: 4),
-      ),
-    );
-  }
 
   Future<void> _handleCallDriver() async {
     if (_driverPhoneNumber == null) {
@@ -244,7 +190,6 @@ class _DriverTrackingScreenState extends State<DriverTrackingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: CustomAppBar(title: 'Seguimiento del Conductor'),

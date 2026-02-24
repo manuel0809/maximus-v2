@@ -13,7 +13,6 @@ class ActiveRentalCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final vehicle = rental['vehicles'] ?? {};
 
     return Container(

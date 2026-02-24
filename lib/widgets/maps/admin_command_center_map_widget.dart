@@ -18,7 +18,6 @@ class AdminCommandCenterMapWidget extends StatefulWidget {
 }
 
 class _AdminCommandCenterMapWidgetState extends State<AdminCommandCenterMapWidget> {
-  GoogleMapController? _mapController;
   final _trackingService = TripTrackingService.instance;
 
   StreamSubscription? _tripsSubscription;
@@ -122,7 +121,6 @@ class _AdminCommandCenterMapWidgetState extends State<AdminCommandCenterMapWidge
             zoom: 11,
           ),
           onMapCreated: (controller) {
-            _mapController = controller;
             if (_activeTrips.isNotEmpty) {
               _updateMapElements();
             }

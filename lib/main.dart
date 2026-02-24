@@ -42,9 +42,6 @@ class MaximusApp extends StatelessWidget {
               ...AppRoutes.routes,
               '/login-premium': (context) => const LoginPremiumScreen(),
             },
-            // Temporarily use LoginPremiumScreen as initial if needed, 
-            // but SplashScreen usually handles this.
-            home: const LoginPremiumScreen(),
           ),
         );
       },

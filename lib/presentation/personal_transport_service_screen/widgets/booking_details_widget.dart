@@ -296,60 +296,6 @@ class _BookingDetailsWidgetState extends State<BookingDetailsWidget> {
     );
   }
 
-  Widget _buildLanguageSelector(BuildContext context) {
-    final theme = Theme.of(context);
-    final languages = ['Español', 'English', 'Français', 'Deutsch'];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Idioma Preferido del Conductor',
-          style: theme.textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: theme.colorScheme.onSurface,
-          ),
-        ),
-        SizedBox(height: 1.h),
-        Wrap(
-          spacing: 2.w,
-          runSpacing: 1.h,
-          children: languages.map((language) {
-            final isSelected = false;
-            return GestureDetector(
-              onTap: () {},
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.h),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? theme.colorScheme.primary
-                      : theme.colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(8.0),
-                  border: Border.all(
-                    color: isSelected
-                        ? theme.colorScheme.primary
-                        : theme.colorScheme.outline.withValues(alpha: 0.2),
-                  ),
-                ),
-                child: Text(
-                  language,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: isSelected
-                        ? theme.colorScheme.onPrimary
-                        : theme.colorScheme.onSurface,
-                    fontWeight: isSelected
-                        ? FontWeight.w600
-                        : FontWeight.normal,
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-
   Widget _buildAirportServices(BuildContext context) {
     final theme = Theme.of(context);
 

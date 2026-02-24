@@ -160,20 +160,20 @@ class _PushNotificationSettingsScreenState
                             ],
                             onChanged: (value) async {
                               if (value != null) {
+                                final messenger = ScaffoldMessenger.of(context);
                                 await localization.setLanguage(value);
-                                if (mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        localization.translate(
-                                          'language_changed',
-                                        ),
+                                if (!mounted) return;
+                                messenger.showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      localization.translate(
+                                        'language_changed',
                                       ),
-                                      backgroundColor: Colors.green,
-                                      duration: Duration(seconds: 2),
                                     ),
-                                  );
-                                }
+                                    backgroundColor: Colors.green,
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                );
                               }
                             },
                           ),

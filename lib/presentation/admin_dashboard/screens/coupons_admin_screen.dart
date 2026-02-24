@@ -96,19 +96,24 @@ class _CouponsAdminScreenState extends State<CouponsAdminScreen> {
               final discount = double.tryParse(discountController.text) ?? 0;
               
               if (code.isNotEmpty && discount > 0) {
-                Navigator.pop(context);
+                final navigator = Navigator.of(context);
+                final messenger = ScaffoldMessenger.of(context);
+                navigator.pop();
                 try {
                   await _loyaltyService.createCoupon(
                     code: code,
                     discountPercentage: discount,
                   );
                   _loadCoupons();
+                  if (!mounted) return;
+                  messenger.showSnackBar(
+                    const SnackBar(content: Text('Cupón creado')),
+                  );
                 } catch (e) {
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error: $e')),
-                    );
-                  }
+                  if (!mounted) return;
+                  messenger.showSnackBar(
+                    SnackBar(content: Text('Error: $e')),
+                  );
                 }
               }
             },

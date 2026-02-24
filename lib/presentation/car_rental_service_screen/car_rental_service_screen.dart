@@ -629,19 +629,6 @@ class _CarRentalServiceScreenState extends State<CarRentalServiceScreen> {
     );
   }
 
-  double _calculateTotal(dynamic pricePerDay) {
-    if (pickupDate == null || dropoffDate == null) return 0;
-    final price = (pricePerDay is int)
-        ? pricePerDay.toDouble()
-        : (pricePerDay as double);
-    final calculation = _rentalService.calculateRentalPrice(
-      pricePerDay: price,
-      pickupDate: pickupDate!,
-      dropoffDate: dropoffDate!,
-    );
-    return calculation['total'] ?? 0;
-  }
-
   Future<void> _confirmReservation(Map<String, dynamic> vehicle, double total) async {
     Navigator.pop(context);
 

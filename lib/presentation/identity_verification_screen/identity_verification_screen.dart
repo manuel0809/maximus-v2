@@ -22,6 +22,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
   bool _isUploading = false;
 
   Future<void> _pickImage(bool isLicense) async {
+    final messenger = ScaffoldMessenger.of(context);
     try {
       final XFile? selected = await _picker.pickImage(
         source: ImageSource.camera,
@@ -37,7 +38,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         SnackBar(content: Text('Error al capturar imagen: $e')),
       );
     }

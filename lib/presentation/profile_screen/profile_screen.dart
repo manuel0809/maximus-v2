@@ -157,7 +157,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _showEditProfileDialog() {
-    final theme = Theme.of(context);
     final nameController = TextEditingController(text: userData?['full_name']);
     final phoneController = TextEditingController(text: userData?['phone']);
 
@@ -178,11 +177,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ElevatedButton(
             onPressed: () async {
               if (userData?['id'] != null) {
+                final navigator = Navigator.of(context);
                 await _userService.updateUserProfile(
                   userId: userData!['id'],
                   updates: {'full_name': nameController.text.trim(), 'phone': phoneController.text.trim()},
                 );
-                Navigator.pop(context);
+                if (!mounted) return;
+                navigator.pop();
                 _loadUserData();
               }
             },

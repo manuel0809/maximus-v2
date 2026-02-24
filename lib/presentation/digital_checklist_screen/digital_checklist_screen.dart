@@ -37,8 +37,6 @@ class _DigitalChecklistScreenState extends State<DigitalChecklistScreen> {
     'Tablero (Gas/Km)': null,
   };
 
-  final Map<String, XFile?> _damagePhotos = {};
-
   double _gasLevel = 0.5; // 0.0 to 1.0
   final TextEditingController _mileageController = TextEditingController();
   final TextEditingController _notesController = TextEditingController();
@@ -46,6 +44,7 @@ class _DigitalChecklistScreenState extends State<DigitalChecklistScreen> {
   bool _isSaving = false;
 
   Future<void> _takePhoto(String label) async {
+    final messenger = ScaffoldMessenger.of(context);
     try {
       final XFile? photo = await _picker.pickImage(
         source: ImageSource.camera,
@@ -55,7 +54,7 @@ class _DigitalChecklistScreenState extends State<DigitalChecklistScreen> {
         setState(() => _photos[label] = photo);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         SnackBar(content: Text('Error al capturar foto: $e')),
       );
     }
@@ -80,6 +79,8 @@ class _DigitalChecklistScreenState extends State<DigitalChecklistScreen> {
     setState(() => _isSaving = true);
 
     try {
+      final messenger = ScaffoldMessenger.of(context);
+      final navigator = Navigator.of(context);
       final Map<String, String> uploadedUrls = {};
 
       // Upload Photos
@@ -122,15 +123,14 @@ class _DigitalChecklistScreenState extends State<DigitalChecklistScreen> {
         'signature_url': signatureUrl,
         'created_at': DateTime.now().toIso8601String(),
       };
-
+      
       await _rentalService.saveDigitalChecklist(checklistData);
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Checklist guardado correctamente')),
-        );
-        Navigator.pop(context);
-      }
+      if (!mounted) return;
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Checklist guardado correctamente')),
+      );
+      navigator.pop();
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -144,7 +144,6 @@ class _DigitalChecklistScreenState extends State<DigitalChecklistScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: CustomAppBar(

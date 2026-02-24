@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../services/car_rental_service.dart';
 import '../../widgets/custom_app_bar.dart';
 
 class ActiveRentalDashboard extends StatefulWidget {
@@ -14,7 +13,6 @@ class ActiveRentalDashboard extends StatefulWidget {
 }
 
 class _ActiveRentalDashboardState extends State<ActiveRentalDashboard> {
-  final CarRentalService _rentalService = CarRentalService.instance;
 
   Future<void> _makeEmergencyCall() async {
     final Uri launchUri = Uri(scheme: 'tel', path: '911'); // Or company assistance number

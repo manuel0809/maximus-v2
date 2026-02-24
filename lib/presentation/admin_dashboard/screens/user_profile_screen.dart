@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import '../../../services/user_service.dart';
-import '../../../services/realtime_service.dart';
 
 class UserProfileScreen extends StatefulWidget {
   final String userId;
@@ -19,7 +18,6 @@ class UserProfileScreen extends StatefulWidget {
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
   final UserService _userService = UserService.instance;
-  final RealtimeService _realtimeService = RealtimeService.instance;
 
   Map<String, dynamic>? _userProfile;
   List<Map<String, dynamic>> _userTrips = [];

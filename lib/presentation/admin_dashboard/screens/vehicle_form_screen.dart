@@ -109,7 +109,6 @@ class _VehicleFormScreenState extends State<VehicleFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: CustomAppBar(title: widget.vehicle == null ? 'Nuevo Vehículo' : 'Editar Vehículo'),

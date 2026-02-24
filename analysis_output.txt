@@ -1,0 +1,34 @@
+Analyzing maximus_v2...                                         
+
+warning • The value of the field '_rentalService' isn't used • lib/presentation/active_rental_dashboard/active_rental_dashboard.dart:17:26 • unused_field
+warning • The declaration '_buildSummarySection' isn't referenced • lib/presentation/admin_dashboard/admin_dashboard.dart:499:10 • unused_element
+warning • The declaration '_buildCarRentalSection' isn't referenced • lib/presentation/admin_dashboard/admin_dashboard.dart:523:10 • unused_element
+warning • The declaration '_buildDriverContactsContent' isn't referenced • lib/presentation/admin_dashboard/admin_dashboard.dart:831:10 • unused_element
+warning • The declaration '_buildUserManagementSection' isn't referenced • lib/presentation/admin_dashboard/admin_dashboard.dart:838:10 • unused_element
+warning • The declaration '_onSidebarItemTap' isn't referenced • lib/presentation/admin_dashboard/admin_dashboard.dart:1004:8 • unused_element
+warning • The value of the local variable 'level' isn't used • lib/presentation/admin_dashboard/screens/admin_user_management_screen.dart:93:11 • unused_local_variable
+   info • Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check • lib/presentation/admin_dashboard/screens/reservations_admin_screen.dart:202:35 • use_build_context_synchronously
+warning • The value of the field '_realtimeService' isn't used • lib/presentation/admin_dashboard/screens/user_profile_screen.dart:22:25 • unused_field
+warning • The value of the local variable 'theme' isn't used • lib/presentation/admin_dashboard/screens/vehicle_form_screen.dart:112:11 • unused_local_variable
+warning • The declaration '_calculateTotal' isn't referenced • lib/presentation/car_rental_service_screen/car_rental_service_screen.dart:632:10 • unused_element
+warning • The value of the local variable 'colorScheme' isn't used • lib/presentation/client_dashboard/client_dashboard_initial_page.dart:354:11 • unused_local_variable
+warning • The declaration '_buildLocationRow' isn't referenced • lib/presentation/client_dashboard/client_dashboard_initial_page.dart:546:10 • unused_element
+warning • The declaration '_buildHeader' isn't referenced • lib/presentation/client_dashboard/client_dashboard_initial_page.dart:594:10 • unused_element
+warning • The value of the local variable 'theme' isn't used • lib/presentation/client_dashboard/widgets/active_rental_card_widget.dart:16:11 • unused_local_variable
+warning • The value of the field '_damagePhotos' isn't used • lib/presentation/digital_checklist_screen/digital_checklist_screen.dart:40:29 • unused_field
+warning • The value of the local variable 'theme' isn't used • lib/presentation/digital_checklist_screen/digital_checklist_screen.dart:149:11 • unused_local_variable
+warning • The declaration '_handleSOSPressed' isn't referenced • lib/presentation/driver_tracking_screen/driver_tracking_screen.dart:131:8 • unused_element
+warning • The value of the local variable 'theme' isn't used • lib/presentation/driver_tracking_screen/driver_tracking_screen.dart:247:11 • unused_local_variable
+warning • The value of the field '_pickupAnnotation' isn't used • lib/presentation/driver_tracking_screen/widgets/tracking_map_widget_io.dart:54:20 • unused_field
+warning • The value of the local variable 'bounds' isn't used • lib/presentation/driver_tracking_screen/widgets/tracking_map_widget_io.dart:278:11 • unused_local_variable
+warning • The value of the local variable 'completedCount' isn't used • lib/presentation/payments_invoices_screen/widgets/payment_statistics_widget.dart:19:11 • unused_local_variable
+warning • The declaration '_buildLanguageSelector' isn't referenced • lib/presentation/personal_transport_service_screen/widgets/booking_details_widget.dart:299:10 • unused_element
+warning • Dead code • lib/presentation/personal_transport_service_screen/widgets/booking_details_widget.dart:325:25 • dead_code
+warning • Dead code • lib/presentation/personal_transport_service_screen/widgets/booking_details_widget.dart:330:27 • dead_code
+warning • Dead code • lib/presentation/personal_transport_service_screen/widgets/booking_details_widget.dart:338:27 • dead_code
+warning • Dead code • lib/presentation/personal_transport_service_screen/widgets/booking_details_widget.dart:341:27 • dead_code
+warning • The value of the local variable 'theme' isn't used • lib/presentation/profile_screen/profile_screen.dart:160:11 • unused_local_variable
+warning • The value of the local variable 'colorScheme' isn't used • lib/widgets/custom_bottom_bar.dart:29:11 • unused_local_variable
+warning • The value of the field '_mapController' isn't used • lib/widgets/maps/admin_command_center_map_widget.dart:21:24 • unused_field
+
+30 issues found. (ran in 2.4s)

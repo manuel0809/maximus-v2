@@ -153,6 +153,7 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
           .maybeSingle();
 
       if (response != null && mounted) {
+        final navigator = Navigator.of(context);
         final isActive = response['is_active'] as bool? ?? true;
         final roleStr = response['role'] as String?;
         final role = AppRole.fromString(roleStr);
@@ -170,11 +171,11 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
         await _userService.updateLastLogin(userId);
 
         if (role.isStaff) {
-          Navigator.of(context).pushReplacementNamed('/admin-dashboard');
+          navigator.pushReplacementNamed('/admin-dashboard');
         } else if (role == AppRole.driver) {
-          Navigator.of(context).pushReplacementNamed('/driver-dashboard-screen');
+          navigator.pushReplacementNamed('/driver-dashboard-screen');
         } else if (role.isClient) {
-          Navigator.of(context).pushReplacementNamed('/client-dashboard');
+          navigator.pushReplacementNamed('/client-dashboard');
         } else {
           _showMessage('Rol no reconocido: $roleStr. Contacta al administrador.');
           await SupabaseService.instance.client.auth.signOut();
