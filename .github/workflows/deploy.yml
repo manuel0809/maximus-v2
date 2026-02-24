@@ -42,5 +42,6 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./build/web/
-          server-dir: ./public_html/
-          dangerous-clean-slate: true # Purge old files to ensure only the new build is present
+          server-dir: ./
+          dangerous-clean-slate: true
+          timeout: 60000 # Increase timeout to 1 minute
