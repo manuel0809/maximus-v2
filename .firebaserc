@@ -1,5 +1,17 @@
 {
   "projects": {
     "default": "maximus-v2-7325f"
+  },
+  "targets": {
+    "maximus-v2-7325f": {
+      "hosting": {
+        "staff": [
+          "maximus-staff"
+        ],
+        "client": [
+          "maximus-client"
+        ]
+      }
+    }
   }
 }

@@ -22,13 +22,26 @@ jobs:
       - name: 📦 Install Dependencies
         run: flutter pub get
 
-      - name: 🏗️ Build Web
-        run: flutter build web --release --base-href /
+      - name: 🏗️ Build Web (Staff)
+        run: flutter build web --release --base-href / --output=build/web_staff --dart-define=APP_FLAVOR=staff
 
-      - name: 🚀 Deploy to Firebase
+      - name: 🏗️ Build Web (Client)
+        run: flutter build web --release --base-href / --output=build/web_client --dart-define=APP_FLAVOR=client
+
+      - name: 🚀 Deploy Staff to Firebase
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_MAXIMUS_V2_7325F }}'
           channelId: live
           projectId: maximus-v2-7325f
+          target: staff
+
+      - name: 🚀 Deploy Client to Firebase
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_MAXIMUS_V2_7325F }}'
+          channelId: live
+          projectId: maximus-v2-7325f
+          target: client
