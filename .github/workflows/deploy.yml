@@ -7,6 +7,7 @@ on:
 
 jobs:
   deploy:
+    name: 🚀 Build and Deploy
     runs-on: ubuntu-latest
     steps:
       - name: 📚 Checkout Code
@@ -18,24 +19,13 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: 📦 Cache Pub Dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pub-
-
       - name: 📦 Install Dependencies
         run: flutter pub get
-
-      - name: 🔍 Analyze Code
-        run: flutter analyze
 
       - name: 🏗️ Build Web
         run: flutter build web --release --base-href /
 
-      - name: "🚀 Deploy via FTP"
+      - name: "🚀 Full Domain Takeover"
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
