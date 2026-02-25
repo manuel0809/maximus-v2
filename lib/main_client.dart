@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-import 'app.dart';
+import 'main_common.dart';
 
-void main() {
-  runApp(const MaximusApp());
+void main() async {
+  await mainCommon();
 }
