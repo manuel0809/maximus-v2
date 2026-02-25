@@ -1,23 +1,26 @@
+Options -Indexes
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
-  
-  # Si el archivo o directorio existe, servirlo directamente
-  RewriteCond %{REQUEST_FILENAME} -f
-  RewriteCond %{REQUEST_FILENAME} -d
-  RewriteRule . - [L]
-  
-  # De lo contrario, redirigir todo a index.html para que Flutter maneje el routing
-  RewriteRule ^(.*)$ index.html [L]
+
+  # Permitir archivos y carpetas existentes directamente
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+
+  # Todo lo demás → index.html (necesario para Flutter SPA)
+  RewriteRule ^ index.html [L]
 </IfModule>
 
-# Prevenir el listado de directorios para evitar 403 si el index no se detecta
-Options -Indexes
-
-# Asegurar tipos MIME correctos
+# MIME types
 <IfModule mod_mime.c>
   AddType application/javascript .js
+  AddType application/wasm .wasm
   AddType application/json .json
   AddType image/svg+xml .svg
-  AddType font/woff2 .woff2
+</IfModule>
+
+# Habilitar compresion
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html application/javascript application/json text/css
 </IfModule>
