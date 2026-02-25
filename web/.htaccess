@@ -1,26 +1,7 @@
 Options -Indexes
+DirectoryIndex index.html
 
-<IfModule mod_rewrite.c>
-  RewriteEngine On
-  RewriteBase /
-
-  # Permitir archivos y carpetas existentes directamente
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-
-  # Todo lo demás → index.html (necesario para Flutter SPA)
-  RewriteRule ^ index.html [L]
-</IfModule>
-
-# MIME types
-<IfModule mod_mime.c>
-  AddType application/javascript .js
-  AddType application/wasm .wasm
-  AddType application/json .json
-  AddType image/svg+xml .svg
-</IfModule>
-
-# Habilitar compresion
-<IfModule mod_deflate.c>
-  AddOutputFilterByType DEFLATE text/html application/javascript application/json text/css
-</IfModule>
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]
