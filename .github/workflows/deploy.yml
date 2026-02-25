@@ -1,4 +1,4 @@
-name: Deploy to Hostinger
+name: Deploy to Firebase Hosting
 
 on:
   push:
@@ -25,20 +25,10 @@ jobs:
       - name: 🏗️ Build Web
         run: flutter build web --release --base-href /
 
-      - name: "🚀 Upload and Fix Permissions"
-        env:
-          FTP_SERVER: ${{ secrets.FTP_SERVER }}
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-        run: |
-          sudo apt-get update && sudo apt-get install -y lftp
-          # Ajustar permisos localmente antes de subir
-          find ./build/web/ -type d -exec chmod 755 {} \;
-          find ./build/web/ -type f -exec chmod 644 {} \;
-          # Subir con mirror robusto y con reintentos
-          lftp -c "set ftp:ssl-allow no; \
-          set net:timeout 30; \
-          set net:max-retries 3; \
-          set net:reconnect-interval-base 5; \
-          open -u \"$FTP_USERNAME\",\"$FTP_PASSWORD\" $FTP_SERVER; \
-          mirror -R --verbose --parallel=5 --perms ./build/web/ /public_html/"
+      - name: 🚀 Deploy to Firebase
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_MAXIMUS_V2_7325F }}'
+          channelId: live
+          projectId: maximus-v2-7325f
