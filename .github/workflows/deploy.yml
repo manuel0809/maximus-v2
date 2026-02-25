@@ -1,6 +1,4 @@
-# Final Clean Deployment - Maximus Level Group
 name: Deploy to Hostinger
-
 
 on:
   push:
@@ -27,14 +25,11 @@ jobs:
       - name: 🏗️ Build Web
         run: flutter build web --release --base-href /
 
-      - name: "🚀 Final Fix - Upload Everywhere"
+      - name: "🚀 Upload and Fix Permissions"
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
           sudo apt-get update && sudo apt-get install -y lftp
-          # Subir a la raíz (donde funciona el subdominio)
-          lftp -c "set ftp:ssl-allow no; open -u \"$FTP_USERNAME\",\"$FTP_PASSWORD\" $FTP_SERVER; mirror -R --verbose ./build/web/ ./"
-          # Subir también a public_html (donde vive el dominio principal)
-          lftp -c "set ftp:ssl-allow no; open -u \"$FTP_USERNAME\",\"$FTP_PASSWORD\" $FTP_SERVER; mirror -R --verbose ./build/web/ /public_html/"
+          lftp -c "set ftp:ssl-allow no; open -u \"$FTP_USERNAME\",\"$FTP_PASSWORD\" $FTP_SERVER; mirror -R --verbose --perms ./build/web/ /public_html/; chmod -R 755 /public_html/"
