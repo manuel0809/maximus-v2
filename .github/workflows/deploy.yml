@@ -32,4 +32,8 @@ jobs:
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
           sudo apt-get update && sudo apt-get install -y lftp
-          lftp -c "set ftp:ssl-allow no; open -u \"$FTP_USERNAME\",\"$FTP_PASSWORD\" $FTP_SERVER; mirror -R --verbose --perms ./build/web/ /public_html/; chmod -R 755 /public_html/"
+          lftp -c "set ftp:ssl-allow no; \
+          open -u \"$FTP_USERNAME\",\"$FTP_PASSWORD\" $FTP_SERVER; \
+          mirror -R --verbose --delete --perms ./build/web/ /public_html/; \
+          find /public_html/ -type d -exec chmod 755 {} \;; \
+          find /public_html/ -type f -exec chmod 644 {} \;"
