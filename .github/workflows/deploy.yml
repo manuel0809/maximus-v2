@@ -23,10 +23,10 @@ jobs:
         run: flutter pub get
 
       - name: 🏗️ Build Web (Staff)
-        run: flutter build web --release --base-href / --output=build/web_staff --dart-define=APP_FLAVOR=staff
+        run: flutter build web --release --target lib/main_staff.dart --base-href / --output=build/web_staff --dart-define=APP_FLAVOR=staff
 
       - name: 🏗️ Build Web (Client)
-        run: flutter build web --release --base-href / --output=build/web_client --dart-define=APP_FLAVOR=client
+        run: flutter build web --release --target lib/main_client.dart --base-href / --output=build/web_client --dart-define=APP_FLAVOR=client
 
       - name: 🚀 Deploy Staff to Firebase
         uses: FirebaseExtended/action-hosting-deploy@v0
