@@ -89,14 +89,24 @@ class _SplashScreenState extends State<SplashScreen>
       if (mounted) {
         final user = Supabase.instance.client.auth.currentUser;
         debugPrint('SplashScreen: Auth check - User ID: ${user?.id}');
+        
+        // --- CLIENT LANDING PAGE LOGIC ---
         if (user == null) {
+          if (AppConfig.isClient) {
+            debugPrint('SplashScreen: Unauthorized client. Navigating to Landing/Dashboard');
+            Navigator.of(context, rootNavigator: true)
+                .pushReplacementNamed(AppRoutes.clientDashboard);
+            return;
+          }
           debugPrint('SplashScreen: Navigating to Login');
-          if (!mounted) return;
           Navigator.of(context, rootNavigator: true)
               .pushReplacementNamed(AppRoutes.loginRegistration);
-        } else {
-          debugPrint('SplashScreen: Fetching profile for ${user.id}');
-          final profile = await UserService.instance.getUserById(user.id);
+          return;
+        }
+        // ---------------------------------
+
+        debugPrint('SplashScreen: Fetching profile for ${user.id}');
+        final profile = await UserService.instance.getUserById(user.id);
           debugPrint('SplashScreen: Profile fetch result: ${profile != null ? "Success" : "Empty"}');
           if (!mounted) return;
           

@@ -244,7 +244,7 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
                 height: 50.w,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color(0xFF8B1538).withValues(alpha: 0.1),
+                  color: const Color(0xFFD4AF37).withValues(alpha: 0.1),
                 ),
               ),
             ),
@@ -418,7 +418,8 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
                                     onChanged: (value) {
                                       setState(() => _remember = value!);
                                     },
-                                    activeColor: const Color(0xFF8B1538),
+                                    activeColor: const Color(0xFFD4AF37),
+                                    checkColor: Colors.black,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(4.0),
                                     ),
@@ -445,7 +446,7 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
                                 _localization.translate('forgot_password'),
                                 style: TextStyle(
                                   fontSize: 10.sp,
-                                  color: const Color(0xFFE8B4B8),
+                                  color: const Color(0xFFD4AF37),
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -487,13 +488,13 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(14.0),
                             gradient: const LinearGradient(
-                              colors: [Color(0xFF8B1538), Color(0xFFB01D48)],
+                              colors: [Color(0xFFD4AF37), Color(0xFFB8860B)],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF8B1538).withValues(alpha: 0.3),
+                                color: const Color(0xFFD4AF37).withValues(alpha: 0.3),
                                 blurRadius: 15,
                                 offset: const Offset(0, 8),
                               ),
@@ -510,25 +511,23 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
                               ),
                             ),
                             child: _loading
-                                ? SizedBox(
+                                ? const SizedBox(
                                     height: 20,
                                     width: 20,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
                                       valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white,
+                                        Colors.black,
                                       ),
                                     ),
                                   )
-                                : Text(
-                                    _isLogin
-                                        ? _localization.translate('login_button')
-                                        : _localization.translate('register_button'),
+                                : const Text(
+                                    'CONTINUAR',
                                     style: TextStyle(
-                                      fontSize: 13.sp,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white,
-                                      letterSpacing: 1.1,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w900,
+                                      color: Colors.black,
+                                      letterSpacing: 2.0,
                                     ),
                                   ),
                           ),
@@ -558,7 +557,7 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
                               _isLogin ? 'Crear cuenta' : 'Iniciar sesión',
                               style: TextStyle(
                                 fontSize: 11.sp,
-                                color: const Color(0xFFE8B4B8),
+                                color: const Color(0xFFD4AF37),
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -636,10 +635,10 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
         duration: const Duration(milliseconds: 300),
         padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 0.8.h),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF8B1538) : Colors.white.withValues(alpha: 0.05),
+          color: isSelected ? const Color(0xFFD4AF37) : Colors.white.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(10.0),
           border: Border.all(
-            color: isSelected ? const Color(0xFFE8B4B8).withValues(alpha: 0.3) : Colors.transparent,
+            color: isSelected ? const Color(0xFFD4AF37).withValues(alpha: 0.3) : Colors.transparent,
           ),
         ),
         child: Text(
@@ -647,7 +646,7 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
           style: TextStyle(
             fontSize: 10.sp,
             fontWeight: FontWeight.w700,
-            color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.5),
+            color: isSelected ? Colors.black : Colors.white.withValues(alpha: 0.5),
           ),
         ),
       ),
@@ -661,12 +660,12 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
         duration: const Duration(milliseconds: 300),
         padding: EdgeInsets.symmetric(vertical: 1.5.h),
         decoration: BoxDecoration(
-          color: isActive ? const Color(0xFF8B1538) : Colors.transparent,
+          color: isActive ? const Color(0xFFD4AF37) : Colors.transparent,
           borderRadius: BorderRadius.circular(10.0),
           boxShadow: isActive
               ? [
                   BoxShadow(
-                    color: const Color(0xFF8B1538).withValues(alpha: 0.4),
+                    color: const Color(0xFFD4AF37).withValues(alpha: 0.4),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -675,12 +674,12 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
         ),
         child: Center(
           child: Text(
-            text,
+            text.toUpperCase(),
             style: TextStyle(
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w700,
-              color: isActive ? Colors.white : Colors.white.withValues(alpha: 0.5),
-              letterSpacing: 0.5,
+              fontSize: 11.sp,
+              fontWeight: FontWeight.w900,
+              color: isActive ? Colors.black : Colors.white.withValues(alpha: 0.5),
+              letterSpacing: 1.5,
             ),
           ),
         ),
@@ -765,11 +764,11 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
         padding: EdgeInsets.all(3.w),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFF8B1538).withValues(alpha: 0.15)
+              ? const Color(0xFFD4AF37).withValues(alpha: 0.15)
               : Colors.white.withValues(alpha: 0.03),
           borderRadius: BorderRadius.circular(14.0),
           border: Border.all(
-            color: isSelected ? const Color(0xFF8B1538) : Colors.white.withValues(alpha: 0.1),
+            color: isSelected ? const Color(0xFFD4AF37) : Colors.white.withValues(alpha: 0.1),
             width: isSelected ? 1.5 : 1,
           ),
         ),
@@ -781,13 +780,13 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected ? const Color(0xFFE8B4B8) : Colors.white.withValues(alpha: 0.2),
+                  color: isSelected ? const Color(0xFFD4AF37) : Colors.white.withValues(alpha: 0.2),
                   width: 2,
                 ),
-                color: isSelected ? const Color(0xFF8B1538) : Colors.transparent,
+                color: isSelected ? const Color(0xFFD4AF37) : Colors.transparent,
               ),
               child: isSelected
-                  ? const Icon(Icons.check, size: 10, color: Colors.white)
+                  ? const Icon(Icons.check, size: 10, color: Colors.black)
                   : null,
             ),
             SizedBox(width: 3.w),

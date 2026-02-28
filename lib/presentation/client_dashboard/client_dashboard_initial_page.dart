@@ -184,9 +184,6 @@ class _ClientDashboardInitialPageState
                   const SizedBox(height: 12),
                   _buildBlackButton("Ver tarifas sugeridas"),
                   
-                  const SizedBox(height: 12),
-                  const Text("Inicia sesión para ver tu actividad reciente", style: TextStyle(decoration: TextDecoration.underline, fontSize: 14)),
-                  
                   const SizedBox(height: 48),
                   
                   // --- SUGGESTIONS ---
@@ -197,11 +194,6 @@ class _ClientDashboardInitialPageState
                   const SizedBox(height: 16),
                   
                   ...suggestions.map((s) => _buildSuggestionCard(s)).toList(),
-                  
-                  const SizedBox(height: 40),
-                  
-                  // --- LOGIN CTA SECTION ---
-                  _buildLoginSection(),
                   
                   const SizedBox(height: 40),
                   
@@ -221,7 +213,7 @@ class _ClientDashboardInitialPageState
   Widget _buildHeader() {
     return Container(
       color: Colors.black,
-      padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top + 8, 16, 12),
+      padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 12, 20, 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -229,32 +221,45 @@ class _ClientDashboardInitialPageState
              children: [
                SvgPicture.asset(
                  'assets/images/img_app_logo.svg',
-                 height: 24,
+                 height: 28,
                  colorFilter: const ColorFilter.mode(Color(0xFFD4AF37), BlendMode.srcIn),
                ),
-               const SizedBox(width: 12),
+               const SizedBox(width: 14),
                const Text(
                  "MAXIMUS",
-                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: -0.5),
+                 style: TextStyle(
+                   color: Colors.white, 
+                   fontWeight: FontWeight.w900, 
+                   fontSize: 20, 
+                   letterSpacing: -0.5,
+                 ),
                ),
-               const SizedBox(width: 20),
-               const Text("Viaje", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 14)),
              ],
           ),
           Row(
             children: [
-              const Text("Inicia sesión", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 13)),
-              const SizedBox(width: 16),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFD4AF37), 
-                  borderRadius: BorderRadius.circular(20)
+              TextButton(
+                onPressed: () => Navigator.pushNamed(context, AppRoutes.loginRegistration),
+                child: const Text(
+                  "Log in", 
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14),
                 ),
-                child: const Text("Regístrate", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 13)),
               ),
               const SizedBox(width: 8),
-              const Icon(Icons.menu, color: Colors.white),
+              GestureDetector(
+                onTap: () => Navigator.pushNamed(context, AppRoutes.loginRegistration),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.white, 
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Text(
+                    "Sign up", 
+                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 14),
+                  ),
+                ),
+              ),
             ],
           ),
         ],
@@ -269,14 +274,18 @@ class _ClientDashboardInitialPageState
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(color: const Color(0xFFEEEEEE), borderRadius: BorderRadius.circular(20)),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEEEEEE), 
+                borderRadius: BorderRadius.circular(24),
+              ),
               child: const Row(
                 children: [
-                  Icon(Icons.access_time_filled, size: 16),
-                  SizedBox(width: 8),
-                  Text("Pedir ahora", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                  Icon(Icons.keyboard_arrow_down, size: 18),
+                  Icon(Icons.access_time_filled, size: 18),
+                  SizedBox(width: 10),
+                  Text("Reunirse ahora", style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                  SizedBox(width: 4),
+                  Icon(Icons.keyboard_arrow_down, size: 20),
                 ],
               ),
             ),
@@ -324,143 +333,188 @@ class _ClientDashboardInitialPageState
   }
 
   Widget _buildBlackButton(String text) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 14),
-      decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(8)),
-      alignment: Alignment.center,
-      child: Text(text, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+    return GestureDetector(
+      onTap: () {
+        // Navigation or main action
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.black, 
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            )
+          ]
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          text, 
+          style: const TextStyle(
+            color: Colors.white, 
+            fontWeight: FontWeight.w700, 
+            fontSize: 16,
+            letterSpacing: 0.2,
+          )
+        ),
+      ),
     );
   }
 
   Widget _buildSuggestionCard(Map<String, dynamic> s) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
-      decoration: BoxDecoration(color: const Color(0xFFF3F3F3), borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF6F6F6), 
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
+      ),
       child: Row(
         children: [
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(s['title'], style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 8),
-                Text(s['description'], style: const TextStyle(fontSize: 13, color: Colors.black87)),
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFD4AF37), 
-                    borderRadius: BorderRadius.circular(20)
+                Text(s['title'], style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 10),
+                Text(
+                  s['description'], 
+                  style: TextStyle(fontSize: 14, color: Colors.black.withValues(alpha: 0.7), height: 1.4),
+                ),
+                const SizedBox(height: 20),
+                GestureDetector(
+                  onTap: () => Navigator.pushNamed(context, s['route']),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.black, 
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: const Text(
+                      "Detalles", 
+                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.white),
+                    ),
                   ),
-                  child: const Text("Detalles", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.black)),
                 ),
               ],
             ),
           ),
           const SizedBox(width: 16),
-          Image.network(s['imageUrl'], width: 80, errorBuilder: (_, __, ___) => const Icon(Icons.directions_car, size: 60)),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(
+              s['imageUrl'], 
+              width: 90, 
+              height: 90,
+              fit: BoxFit.contain,
+              errorBuilder: (_, __, ___) => const Icon(Icons.directions_car, size: 60, color: Colors.grey),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildLoginSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text("Inicia sesión para ver los detalles de tu cuenta", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700)),
-        const SizedBox(height: 16),
-        const Text("Consulta viajes anteriores, sugerencias personalizadas, recursos de ventaja y más.", style: TextStyle(fontSize: 14, color: Colors.black87)),
-        const SizedBox(height: 24),
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(8)),
-              child: const Text("Inicia sesión en tu cuenta", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            ),
-            const SizedBox(width: 16),
-            const Text("Crear una cuenta", style: TextStyle(decoration: TextDecoration.underline, fontWeight: FontWeight.w600)),
-          ],
-        ),
-        const SizedBox(height: 24),
-        Image.network(
-          "https://pggvfqmldoizstoxunir.supabase.co/storage/v1/object/public/vehicle-images/fleet/rider_driver_illus.png",
-          errorBuilder: (_, __, ___) => Container(height: 150, color: Colors.grey[200]),
-        ),
-      ],
-    );
-  }
 
   Widget _buildReserveSection() {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFE5F7FF),
-        borderRadius: BorderRadius.circular(12),
+        color: const Color(0xFFF9F9F9), 
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          )
+        ],
       ),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("Planea para más adelante", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 24),
+          const Text(
+            "Planea para más adelante", 
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, letterSpacing: -0.5),
+          ),
+          const SizedBox(height: 20),
           Row(
             children: [
-               Container(
-                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                 decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(20)),
-                 child: const Text("Maximus Reserve", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
-               ),
-               const SizedBox(width: 8),
-               Container(
-                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                 decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-                 child: const Text("Maximus Rent", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12)),
-               ),
+               _buildToggleButton("Maximus Reserve", true),
+               const SizedBox(width: 10),
+               _buildToggleButton("Maximus Rent", false),
             ],
           ),
           const SizedBox(height: 32),
-          const Text("Viaja bien con Maximus Reserve", style: TextStyle(fontSize: 26, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 24),
-          const Text("Elige la fecha y la hora", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          const Text(
+            "Viaja con total tranquilidad", 
+            style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, height: 1.1),
+          ),
           const SizedBox(height: 12),
+          Text(
+            "Elige la fecha y la hora para tu próximo servicio premium.", 
+            style: TextStyle(fontSize: 14, color: Colors.black.withValues(alpha: 0.6)),
+          ),
+          const SizedBox(height: 28),
           Row(
             children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                  decoration: BoxDecoration(color: const Color(0xFFF3F3F3), borderRadius: BorderRadius.circular(8)),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.calendar_today, size: 16),
-                      SizedBox(width: 12),
-                      Text("Fecha", style: TextStyle(fontSize: 14)),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                  decoration: BoxDecoration(color: const Color(0xFFF3F3F3), borderRadius: BorderRadius.circular(8)),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.access_time, size: 16),
-                      SizedBox(width: 12),
-                      Text("Tiempo", style: TextStyle(fontSize: 14)),
-                      Spacer(),
-                      Icon(Icons.keyboard_arrow_down, size: 18),
-                    ],
-                  ),
-                ),
-              ),
+              Expanded(child: _buildDateTimeInput(Icons.calendar_today, "Fecha")),
+              const SizedBox(width: 16),
+              Expanded(child: _buildDateTimeInput(Icons.access_time, "Hora", hasArrow: true)),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           _buildBlackButton("Siguiente"),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildToggleButton(String text, bool active) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+      decoration: BoxDecoration(
+        color: active ? Colors.black : Colors.white, 
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: active ? Colors.black : Colors.black.withValues(alpha: 0.1)),
+      ),
+      child: Text(
+        text, 
+        style: TextStyle(
+          color: active ? Colors.white : Colors.black, 
+          fontWeight: FontWeight.w700, 
+          fontSize: 13,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDateTimeInput(IconData icon, String text, {bool hasArrow = false}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: Colors.white, 
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.1)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: const Color(0xFFD4AF37)),
+          const SizedBox(width: 12),
+          Text(
+            text, 
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.black),
+          ),
+          if (hasArrow) ...[
+            const Spacer(),
+            const Icon(Icons.keyboard_arrow_down, size: 20, color: Colors.black54),
+          ],
         ],
       ),
     );
