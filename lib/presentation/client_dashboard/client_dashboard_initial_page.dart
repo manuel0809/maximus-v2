@@ -606,7 +606,13 @@ class _ClientDashboardInitialPageState
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildActiveTabContent(),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            transitionBuilder: (Widget child, Animation<double> animation) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            child: _buildActiveTabContent(),
+          ),
           const SizedBox(height: 32),
           const Divider(height: 1, color: Color(0xFFEEEEEE)),
           const SizedBox(height: 24),
@@ -617,16 +623,25 @@ class _ClientDashboardInitialPageState
   }
 
   Widget _buildActiveTabContent() {
+    Widget content;
     switch (_selectedTabIndex) {
       case 0: // Viaje
-        return _buildRideContent();
+        content = _buildRideContent();
+        break;
       case 1: // Por Horas
-        return _buildHourlyContent();
+        content = _buildHourlyContent();
+        break;
       case 2: // Reserva
-        return _buildReserveContent();
+        content = _buildReserveContent();
+        break;
+      case 3: // Renta de Autos
+        content = _buildRentalContent();
+        break;
       default:
-        return _buildRideContent();
+        // Other tabs might point to empty or specialized widgets in the future
+        content = _buildRideContent();
     }
+    return KeyedSubtree(key: ValueKey<int>(_selectedTabIndex), child: content);
   }
 
   Widget _buildRideContent() {
@@ -778,6 +793,116 @@ class _ClientDashboardInitialPageState
             _buildSuggestionCard("Food", Icons.restaurant, 5),
             _buildSuggestionCard("Grocery", Icons.shopping_basket, 6),
           ],
+        )
+      ],
+    );
+  }
+
+  Widget _buildRentalContent() {
+    final cars = [
+      {'name': 'Black', 'desc': 'Viajes en vehículos de gama alta', 'passengers': 4, 'time': '11 min', 'price': '84.97 US\$', 'img': 'assets/images/Untitled-1770903998939.jpeg'},
+      {'name': 'Black SUV', 'desc': 'Viajes de lujo para 6 personas con socios de la App profesionales', 'passengers': 6, 'time': '10 min', 'price': '101.98 US\$', 'img': 'assets/images/Untitled-1770905042048.jpeg'},
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Vehículos de Alquiler",
+          style: TextStyle(fontSize: 34, fontWeight: FontWeight.w800, letterSpacing: -1, color: Colors.black),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          "Selecciona el vehículo perfecto para ti.",
+          style: TextStyle(fontSize: 14, color: Colors.black54),
+        ),
+        const SizedBox(height: 24),
+        SizedBox(
+          height: 310,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: cars.length,
+            separatorBuilder: (context, index) => const SizedBox(width: 16),
+            itemBuilder: (context, index) {
+              final car = cars[index];
+              return Container(
+                width: 280,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF3F3F3),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFE5E5E5)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                      child: Image.asset(
+                         car['img'] as String,
+                         height: 140,
+                         width: double.infinity,
+                         fit: BoxFit.cover,
+                         errorBuilder: (context, error, stackTrace) => Container(
+                           height: 140,
+                           color: Colors.black87,
+                           child: const Icon(Icons.directions_car, color: Color(0xFFD4AF37), size: 48),
+                         ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(car['name'] as String, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: Colors.black)),
+                              Row(
+                                children: [
+                                  const Icon(Icons.person, size: 14, color: Colors.black),
+                                  const SizedBox(width: 4),
+                                  Text('${car['passengers']}', style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 14)),
+                                ],
+                              )
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(car['desc'] as String, style: const TextStyle(fontSize: 12, color: Colors.black54), maxLines: 2, overflow: TextOverflow.ellipsis),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(car['time'] as String, style: const TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.w600)),
+                                  Text(car['price'] as String, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: Colors.black)),
+                                ],
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Reserva para ${car['name']} iniciada")));
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFD4AF37),
+                                  foregroundColor: Colors.black,
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                ),
+                                child: const Text("Reservar", style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                              )
+                            ],
+                          )
+                        ],
+                      )
+                    )
+                  ],
+                ),
+              );
+            },
+          )
         )
       ],
     );

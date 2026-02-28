@@ -234,26 +234,26 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Logo
+                  // Dynamic Logo
                   Center(
-                    child: Image.asset(
-                      'assets/images/Untitled-1770930294814.jpeg',
-                      height: 8.h,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                  SizedBox(height: 2.h),
-
-                  // Brand Text
-                  const Center(
-                    child: Text(
-                      'MAXIMUS',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                        letterSpacing: 2,
-                      ),
+                    child: Builder(
+                      builder: (context) {
+                        final isDark = Theme.of(context).brightness == Brightness.dark;
+                        // Use try-catch or errorBuilder to ensure it doesn't crash if files are renamed
+                        return Image.asset(
+                          isDark ? 'assets/images/logo_dark.jpeg' : 'assets/images/logo_light.jpeg',
+                          height: 12.h,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                             // Fallback to the currently known image if the user hasn't renamed them yet
+                             return Image.asset(
+                               'assets/images/Untitled-1770930294814.jpeg',
+                               height: 12.h,
+                               fit: BoxFit.contain,
+                             );
+                          },
+                        );
+                      }
                     ),
                   ),
                   SizedBox(height: 4.h),
@@ -434,9 +434,9 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
                               ),
                             ),
                           )
-                        : Text(
-                            _isLogin ? 'Iniciar sesión' : 'Registrarse',
-                            style: const TextStyle(
+                        : const Text(
+                            'Continuar',
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: Colors.black,
