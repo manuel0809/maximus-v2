@@ -2,15 +2,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
-import 'package:provider/provider.dart';
-import 'package:sizer/sizer.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/app_export.dart';
-import '../../services/localization_service.dart';
 import '../../services/notification_service.dart';
 import '../../services/realtime_service.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ClientDashboardInitialPage extends StatefulWidget {
   const ClientDashboardInitialPage({super.key});
@@ -25,37 +22,15 @@ class _ClientDashboardInitialPageState
   String userName = "";
   String currentLocation = "";
   bool isLoadingLocation = true;
-  bool isRefreshing = false;
+  LatLng? _currentLatLng;
   int unreadNotificationCount = 0;
+  GoogleMapController? _mapController;
+  
+  // Tabs: 0 -> Viaje, 1 -> Rentas Por Horas, 2 -> Reserve
+  int _selectedTabIndex = 0;
 
   final NotificationService _notificationService = NotificationService.instance;
   final RealtimeService _realtimeService = RealtimeService.instance;
-
-  Map<String, dynamic>? activeRental;
-
-  final List<Map<String, dynamic>> suggestions = [
-    {
-      "id": 1,
-      "title": "Ride",
-      "description": "Viaje a cualquier lugar con Maximus. Pida un viaje, súbase y relájese.",
-      "imageUrl": "https://pggvfqmldoizstoxunir.supabase.co/storage/v1/object/public/vehicle-images/fleet/luxury_sedan.png", // Replaced with a generic car image URL
-      "route": "/car-rental-service-screen",
-    },
-    {
-      "id": 2,
-      "title": "Reserve",
-      "description": "Reserve su viaje con anticipación para que pueda relajarse ese día.",
-      "imageUrl": "https://pggvfqmldoizstoxunir.supabase.co/storage/v1/object/public/vehicle-images/fleet/calendar_icon.png", 
-      "route": "/car-rental-booking-screen",
-    },
-    {
-      "id": 3,
-      "title": "Rental Cars",
-      "description": "Su renta de vehículos perfecta está a unos clics de distancia.",
-      "imageUrl": "https://pggvfqmldoizstoxunir.supabase.co/storage/v1/object/public/vehicle-images/fleet/car_key.png",
-      "route": "/car-rental-service-screen",
-    },
-  ];
 
   @override
   void initState() {
@@ -63,28 +38,15 @@ class _ClientDashboardInitialPageState
     _getCurrentLocation();
     _loadUnreadNotificationCount();
     _loadUserProfile();
-    _loadActiveRental();
   }
 
   Future<void> _loadUnreadNotificationCount() async {
     try {
       final count = await _notificationService.getUnreadCount();
-      setState(() => unreadNotificationCount = count);
-    } catch (e) {}
-  }
-
-  Future<void> _loadActiveRental() async {
-    try {
-      final user = Supabase.instance.client.auth.currentUser;
-      if (user == null) return;
-      final response = await Supabase.instance.client
-          .from('rentals')
-          .select('*, vehicles(*)')
-          .eq('user_id', user.id)
-          .eq('status', 'active')
-          .maybeSingle();
-      if (mounted) setState(() => activeRental = response);
-    } catch (e) {}
+      if (mounted) setState(() => unreadNotificationCount = count);
+    } catch (e) {
+      debugPrint("Error loading notifications: $e");
+    }
   }
 
   Future<void> _loadUserProfile() async {
@@ -93,29 +55,42 @@ class _ClientDashboardInitialPageState
       if (profile != null && mounted) {
         setState(() => userName = profile['full_name'] ?? 'Usuario');
       }
-    } catch (e) {}
+    } catch (e) {
+      debugPrint("Error loading profile: $e");
+    }
   }
 
   Future<void> _getCurrentLocation() async {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        setState(() { currentLocation = "Doral, Miami"; isLoadingLocation = false; });
+        if (mounted) setState(() { currentLocation = "Doral, Miami"; isLoadingLocation = false; });
         return;
       }
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          setState(() { currentLocation = "Miami, FL"; isLoadingLocation = false; });
+          if (mounted) setState(() { currentLocation = "Doral, Miami"; isLoadingLocation = false; });
           return;
         }
       }
       Position position = await Geolocator.getCurrentPosition();
       final locationName = await _reverseGeocode(position.latitude, position.longitude);
-      if (mounted) setState(() { currentLocation = locationName; isLoadingLocation = false; });
+      
+      if (mounted) {
+        setState(() { 
+          currentLocation = locationName; 
+          isLoadingLocation = false; 
+          _currentLatLng = LatLng(position.latitude, position.longitude);
+        });
+        
+        if (_mapController != null && _currentLatLng != null) {
+          _mapController!.animateCamera(CameraUpdate.newLatLngZoom(_currentLatLng!, 14));
+        }
+      }
     } catch (e) {
-      if (mounted) setState(() { currentLocation = "Miami, FL"; isLoadingLocation = false; });
+      if (mounted) setState(() { currentLocation = "Doral, Miami"; isLoadingLocation = false; });
     }
   }
 
@@ -138,128 +113,123 @@ class _ClientDashboardInitialPageState
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = MediaQuery.of(context).size.width > 800;
+
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // --- HEADER ---
-            _buildHeader(),
-            
-            // --- MAIN CONTENT ---
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 24),
-                  Row(
-                    children: [
-                      const Icon(Icons.location_on, size: 14, color: Colors.black),
-                      const SizedBox(width: 4),
-                      Text(
-                        currentLocation.isNotEmpty ? currentLocation : "Miami, FL",
-                        style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
-                      ),
-                      const SizedBox(width: 4),
-                      const Text("Cambia tu ciudad", style: TextStyle(decoration: TextDecoration.underline, fontSize: 13, color: Colors.black54)),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    "Viaja a cualquier lugar con la app de Maximus",
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w700,
-                      height: 1.1,
-                      letterSpacing: -1,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  
-                  // --- PICKUP/DESTINATION INPUTS ---
-                  _buildRideInputs(),
-                  
-                  const SizedBox(height: 12),
-                  _buildBlackButton("Ver tarifas sugeridas"),
-                  
-                  const SizedBox(height: 48),
-                  
-                  // --- SUGGESTIONS ---
-                  const Text(
-                    "Sugerencias",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
-                  ),
-                  const SizedBox(height: 16),
-                  
-                  ...suggestions.map((s) => _buildSuggestionCard(s)).toList(),
-                  
-                  const SizedBox(height: 40),
-                  
-                  // --- RESERVE SECTION ---
-                  _buildReserveSection(),
-                  
-                  const SizedBox(height: 60),
-                ],
-              ),
-            ),
-          ],
-        ),
+      body: Stack(
+        children: [
+          // 1. Background Map
+          _buildMap(),
+
+          // 2. Interactive Panel
+          if (isDesktop)
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 80,
+              left: 40,
+              bottom: 40,
+              width: 420,
+              child: _buildDesktopPanel(),
+            )
+          else
+            _buildMobileBottomSheet(),
+
+          // 3. Header Overlay
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: _buildHeader(isDesktop),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildMap() {
+    return GoogleMap(
+      initialCameraPosition: CameraPosition(
+        target: _currentLatLng ?? const LatLng(25.8088, -80.3228), // Doral, Miami default
+        zoom: 12,
+      ),
+      myLocationEnabled: true,
+      myLocationButtonEnabled: false,
+      zoomControlsEnabled: false,
+      mapType: MapType.normal,
+      onMapCreated: (controller) {
+        _mapController = controller;
+        if (_currentLatLng != null) {
+          _mapController?.animateCamera(CameraUpdate.newLatLngZoom(_currentLatLng!, 14));
+        }
+      },
+    );
+  }
+
+  Widget _buildHeader(bool isDesktop) {
+    final user = Supabase.instance.client.auth.currentUser;
+    final isLoggedIn = user != null;
+
     return Container(
-      color: Colors.black,
-      padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 12, 20, 16),
+      color: Colors.white,
+      padding: EdgeInsets.fromLTRB(isDesktop ? 40 : 20, MediaQuery.of(context).padding.top + 16, isDesktop ? 40 : 20, 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-             children: [
-               SvgPicture.asset(
-                 'assets/images/img_app_logo.svg',
-                 height: 28,
-                 colorFilter: const ColorFilter.mode(Color(0xFFD4AF37), BlendMode.srcIn),
-               ),
-               const SizedBox(width: 14),
-               const Text(
-                 "MAXIMUS",
-                 style: TextStyle(
-                   color: Colors.white, 
-                   fontWeight: FontWeight.w900, 
-                   fontSize: 20, 
-                   letterSpacing: -0.5,
-                 ),
-               ),
-             ],
-          ),
+          // Logo & Tabs (Desktop)
           Row(
             children: [
-              TextButton(
-                onPressed: () => Navigator.pushNamed(context, AppRoutes.loginRegistration),
-                child: const Text(
-                  "Log in", 
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14),
+              const Text(
+                "MAXIMUS",
+                style: TextStyle(
+                  color: Colors.black, 
+                  fontWeight: FontWeight.w900, 
+                  fontSize: 24, 
+                  letterSpacing: -1.0,
                 ),
               ),
-              const SizedBox(width: 8),
-              GestureDetector(
-                onTap: () => Navigator.pushNamed(context, AppRoutes.loginRegistration),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.white, 
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Text(
-                    "Sign up", 
-                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 14),
+              if (isDesktop) ...[
+                const SizedBox(width: 40),
+                _buildHeaderTab("Viaje", Icons.directions_car, 0),
+                const SizedBox(width: 8),
+                _buildHeaderTab("Por Horas", Icons.access_time_filled, 1),
+                const SizedBox(width: 8),
+                _buildHeaderTab("Reserva", Icons.calendar_today, 2),
+              ]
+            ],
+          ),
+          
+          // User Actions
+          Row(
+            children: [
+              if (isLoggedIn) ...[
+                 Container(
+                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                   decoration: BoxDecoration(color: const Color(0xFFF3F3F3), borderRadius: BorderRadius.circular(20)),
+                   child: Row(
+                     children: [
+                       const Icon(Icons.person, color: Colors.black, size: 18),
+                       const SizedBox(width: 8),
+                       Text(userName.isNotEmpty ? userName : "Perfil", style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 13)),
+                       const SizedBox(width: 8),
+                       const Icon(Icons.keyboard_arrow_down, color: Colors.black, size: 18),
+                     ],
+                   )
+                 )
+              ] else ...[
+                TextButton(
+                  onPressed: () => Navigator.pushNamed(context, AppRoutes.loginRegistration),
+                  child: const Text("Log in", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 14)),
+                ),
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () => Navigator.pushNamed(context, AppRoutes.loginRegistration),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(24)),
+                    child: const Text("Sign up", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14)),
                   ),
                 ),
-              ),
+              ]
             ],
           ),
         ],
@@ -267,255 +237,180 @@ class _ClientDashboardInitialPageState
     );
   }
 
-  Widget _buildRideInputs() {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildHeaderTab(String title, IconData icon, int index) {
+    final isSelected = _selectedTabIndex == index;
+    return GestureDetector(
+      onTap: () => setState(() => _selectedTabIndex = index),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFFF3F3F3) : Colors.transparent,
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: const Color(0xFFEEEEEE), 
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: const Row(
-                children: [
-                  Icon(Icons.access_time_filled, size: 18),
-                  SizedBox(width: 10),
-                  Text("Reunirse ahora", style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
-                  SizedBox(width: 4),
-                  Icon(Icons.keyboard_arrow_down, size: 20),
-                ],
-              ),
-            ),
+            Icon(icon, size: 18, color: Colors.black),
+            const SizedBox(width: 8),
+            Text(title, style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500)),
           ],
         ),
-        const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF3F3F3), 
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.black.withValues(alpha: 0.1)),
-          ),
-          child: Row(
+      ),
+    );
+  }
+
+  Widget _buildDesktopPanel() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          )
+        ]
+      ),
+      child: _buildPanelContent(),
+    );
+  }
+
+  Widget _buildMobileBottomSheet() {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 20,
+              offset: const Offset(0, -5),
+            )
+          ]
+        ),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Column(
-                children: [
-                  Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle)),
-                  Container(width: 1, height: 35, color: Colors.black),
-                  Container(width: 8, height: 8, color: Colors.black),
-                ],
-              ),
-              const SizedBox(width: 16),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              const SizedBox(height: 12),
+              Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))),
+              const SizedBox(height: 12),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
                   children: [
-                    Text("Punto de partida", style: TextStyle(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w400)),
-                    Divider(height: 32, thickness: 1),
-                    Text("¿A dónde vas?", style: TextStyle(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w400)),
+                    _buildHeaderTab("Viaje", Icons.directions_car, 0),
+                    const SizedBox(width: 8),
+                    _buildHeaderTab("Por Horas", Icons.access_time_filled, 1),
+                    const SizedBox(width: 8),
+                    _buildHeaderTab("Reserva", Icons.calendar_today, 2),
                   ],
                 ),
               ),
-              const Column(
-                children: [
-                  Icon(Icons.near_me, size: 20, color: Colors.black),
-                  SizedBox(height: 32),
-                ],
-              ),
+              const SizedBox(height: 16),
+              _buildPanelContent(),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPanelContent() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            _selectedTabIndex == 0 ? "Solicita un viaje" : _selectedTabIndex == 1 ? "Por hora" : "Planea para más adelante",
+            style: const TextStyle(fontSize: 34, fontWeight: FontWeight.w800, letterSpacing: -1, color: Colors.black),
+          ),
+          const SizedBox(height: 24),
+          _buildLocationInputs(),
+          const SizedBox(height: 24),
+          _buildBlackButton(_selectedTabIndex == 2 ? "Programar Maximus" : "Ver tarifas sugeridas"),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLocationInputs() {
+    return Column(
+      children: [
+        // Time Selector
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFEEEEEE),
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.access_time_filled, size: 16, color: Colors.black),
+                SizedBox(width: 8),
+                Text("Pedir para llevar ahora", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 13)),
+                SizedBox(width: 4),
+                Icon(Icons.keyboard_arrow_down, size: 16, color: Colors.black),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
+        // Inputs
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          decoration: BoxDecoration(color: const Color(0xFFF3F3F3), borderRadius: BorderRadius.circular(12)),
+          child: Row(
+            children: [
+               const Icon(Icons.circle, size: 10, color: Colors.black),
+               const SizedBox(width: 16),
+               const Expanded(child: Text("Ingresa una ubicación", style: TextStyle(color: Colors.black38, fontSize: 16, fontWeight: FontWeight.w500))),
+               const Icon(Icons.near_me, size: 20, color: Colors.black),
+            ],
+          )
+        ),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          decoration: BoxDecoration(color: const Color(0xFFF3F3F3), borderRadius: BorderRadius.circular(12)),
+          child: const Row(
+            children: [
+               Icon(Icons.square, size: 10, color: Colors.black),
+               SizedBox(width: 16),
+               Expanded(child: Text("Ingresa un destino", style: TextStyle(color: Colors.black38, fontSize: 16, fontWeight: FontWeight.w500))),
+            ],
+          )
         ),
       ],
     );
   }
 
   Widget _buildBlackButton(String text) {
-    return GestureDetector(
-      onTap: () {
-        // Navigation or main action
-      },
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        decoration: BoxDecoration(
-          color: Colors.black, 
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            )
-          ]
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.black,
+          padding: const EdgeInsets.symmetric(vertical: 18),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          elevation: 0,
         ),
-        alignment: Alignment.center,
+        onPressed: () {
+          // Actions
+        },
         child: Text(
-          text, 
-          style: const TextStyle(
-            color: Colors.white, 
-            fontWeight: FontWeight.w700, 
-            fontSize: 16,
-            letterSpacing: 0.2,
-          )
+          text,
+          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),
         ),
-      ),
-    );
-  }
-
-  Widget _buildSuggestionCard(Map<String, dynamic> s) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF6F6F6), 
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(s['title'], style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 10),
-                Text(
-                  s['description'], 
-                  style: TextStyle(fontSize: 14, color: Colors.black.withValues(alpha: 0.7), height: 1.4),
-                ),
-                const SizedBox(height: 20),
-                GestureDetector(
-                  onTap: () => Navigator.pushNamed(context, s['route']),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.black, 
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: const Text(
-                      "Detalles", 
-                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.white),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 16),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.network(
-              s['imageUrl'], 
-              width: 90, 
-              height: 90,
-              fit: BoxFit.contain,
-              errorBuilder: (_, __, ___) => const Icon(Icons.directions_car, size: 60, color: Colors.grey),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-
-  Widget _buildReserveSection() {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFF9F9F9), 
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          )
-        ],
-      ),
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "Planea para más adelante", 
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, letterSpacing: -0.5),
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-               _buildToggleButton("Maximus Reserve", true),
-               const SizedBox(width: 10),
-               _buildToggleButton("Maximus Rent", false),
-            ],
-          ),
-          const SizedBox(height: 32),
-          const Text(
-            "Viaja con total tranquilidad", 
-            style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, height: 1.1),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            "Elige la fecha y la hora para tu próximo servicio premium.", 
-            style: TextStyle(fontSize: 14, color: Colors.black.withValues(alpha: 0.6)),
-          ),
-          const SizedBox(height: 28),
-          Row(
-            children: [
-              Expanded(child: _buildDateTimeInput(Icons.calendar_today, "Fecha")),
-              const SizedBox(width: 16),
-              Expanded(child: _buildDateTimeInput(Icons.access_time, "Hora", hasArrow: true)),
-            ],
-          ),
-          const SizedBox(height: 24),
-          _buildBlackButton("Siguiente"),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildToggleButton(String text, bool active) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-      decoration: BoxDecoration(
-        color: active ? Colors.black : Colors.white, 
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: active ? Colors.black : Colors.black.withValues(alpha: 0.1)),
-      ),
-      child: Text(
-        text, 
-        style: TextStyle(
-          color: active ? Colors.white : Colors.black, 
-          fontWeight: FontWeight.w700, 
-          fontSize: 13,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDateTimeInput(IconData icon, String text, {bool hasArrow = false}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: Colors.white, 
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black.withValues(alpha: 0.1)),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, size: 18, color: const Color(0xFFD4AF37)),
-          const SizedBox(width: 12),
-          Text(
-            text, 
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.black),
-          ),
-          if (hasArrow) ...[
-            const Spacer(),
-            const Icon(Icons.keyboard_arrow_down, size: 20, color: Colors.black54),
-          ],
-        ],
       ),
     );
   }
