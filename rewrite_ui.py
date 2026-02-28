@@ -1,208 +1,18 @@
-import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
-import '../../services/supabase_service.dart';
-import '../../services/user_service.dart';
-import '../../services/notification_service.dart';
-import '../../core/constants/app_roles.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import sys
 
-/// Modern authentication screen with tabbed interface for login and registration
-class LoginRegistrationScreen extends StatefulWidget {
-  const LoginRegistrationScreen({super.key});
+file_path = "lib/presentation/login_registration_screen/login_registration_screen.dart"
 
-  @override
-  State<LoginRegistrationScreen> createState() =>
-      _LoginRegistrationScreenState();
-}
+with open(file_path, "r") as f:
+    content = f.read()
 
-class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
-  final bool _isLogin = true;
-  bool _isOtpSent = false;
-  final _emailController = TextEditingController();
-  final _otpController = TextEditingController();
-  bool _loading = false;
-  final _userService = UserService.instance;
+# We need to replace everything from `  @override\n  Widget build(BuildContext context) {` to the end of the file.
+build_start = content.find("  @override\n  Widget build(BuildContext context) {")
 
-  @override
-  void initState() {
-    super.initState();
-  }
+if build_start == -1:
+    print("Could not find build method")
+    sys.exit(1)
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _otpController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _handleAuth() async {
-    if (!_isOtpSent) {
-      await _sendOtp();
-    } else {
-      await _verifyOtp();
-    }
-  }
-
-  Future<void> _sendOtp() async {
-    final contact = _emailController.text.trim();
-    if (contact.isEmpty) {
-      _showMessage('Por favor ingresa tu correo o número de celular');
-      return;
-    }
-    setState(() => _loading = true);
-    try {
-      final isEmail = contact.contains('@');
-      if (isEmail) {
-        await SupabaseService.instance.client.auth.signInWithOtp(
-          email: contact,
-          emailRedirectTo: 'maximus://login-callback',
-        );
-      } else {
-        await SupabaseService.instance.client.auth.signInWithOtp(
-          phone: contact,
-        );
-      }
-      setState(() {
-        _isOtpSent = true;
-      });
-      _showMessage('Código enviado. Revisa tu ${isEmail ? "correo" : "SMS"}.');
-    } catch (e) {
-      _showMessage('Error al enviar código: $e');
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
-  }
-
-  Future<void> _verifyOtp() async {
-    final contact = _emailController.text.trim();
-    final otp = _otpController.text.trim();
-    if (otp.isEmpty) {
-      _showMessage('Por favor ingresa el código');
-      return;
-    }
-
-    setState(() => _loading = true);
-    try {
-      final isEmail = contact.contains('@');
-      final response = await SupabaseService.instance.client.auth.verifyOTP(
-        type: isEmail ? OtpType.magiclink : OtpType.sms,
-        token: otp,
-        email: isEmail ? contact : null,
-        phone: !isEmail ? contact : null,
-      );
-
-      if (response.user != null && mounted) {
-        if (!_isLogin) {
-          // New user logic could go here if needed.
-          // For now, Supabase allows setting default metadata via triggers or we just update role.
-          // We default to 'client' role for OTP phone signups.
-          await _userService.updateUserProfile(
-            userId: response.user!.id,
-            updates: {'role': 'client', 'full_name': 'New User'}
-          );
-          
-          // Trigger welcome push notification
-          await NotificationService.instance.sendWelcomeNotification('New User');
-        }
-        await _routeBasedOnRole(response.user!.id);
-      }
-    } catch (e) {
-      _showMessage('Error al verificar código: $e');
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
-  }
-
-  Future<void> _signInWithOAuth(OAuthProvider provider) async {
-    setState(() => _loading = true);
-    try {
-      await SupabaseService.instance.client.auth.signInWithOAuth(
-        provider,
-        redirectTo: 'maximus://login-callback',
-      );
-    } catch (e) {
-      _showMessage('Error con inicio de sesión ${provider.name}: $e');
-      if (mounted) setState(() => _loading = false);
-    }
-  }
-
-  Future<void> _routeBasedOnRole(String userId) async {
-    try {
-      final response = await SupabaseService.instance.client
-          .from('user_profiles')
-          .select('role, is_active, full_name')
-          .eq('id', userId)
-          .maybeSingle();
-
-      if (response != null && mounted) {
-        final navigator = Navigator.of(context);
-        final isActive = response['is_active'] as bool? ?? true;
-        final roleStr = response['role'] as String?;
-        final role = AppRole.fromString(roleStr);
-
-        if (!isActive) {
-          if (role.isStaff) {
-            _showApprovalPendingDialog();
-          } else {
-            _showMessage('Tu cuenta ha sido desactivada. Contacta al administrador.');
-          }
-          await SupabaseService.instance.client.auth.signOut();
-          return;
-        }
-
-        await _userService.updateLastLogin(userId);
-
-        if (role.isStaff) {
-          navigator.pushReplacementNamed('/admin-dashboard');
-        } else if (role == AppRole.driver) {
-          navigator.pushReplacementNamed('/driver-dashboard-screen');
-        } else if (role.isClient) {
-          navigator.pushReplacementNamed('/client-dashboard');
-        } else {
-          _showMessage('Rol no reconocido: $roleStr. Contacta al administrador.');
-          await SupabaseService.instance.client.auth.signOut();
-        }
-      } else if (mounted) {
-        _showMessage('Perfil de usuario no encontrado. Contacta al administrador.');
-        await SupabaseService.instance.client.auth.signOut();
-      }
-    } catch (e) {
-      if (mounted) {
-        _showMessage('Error al cargar perfil: $e');
-        await SupabaseService.instance.client.auth.signOut();
-      }
-    }
-  }
-
-  void _showApprovalPendingDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Solicitud Enviada', style: TextStyle(color: Colors.white)),
-        content: const Text(
-          'Tu registro como administrador está pendiente de aprobación. Se ha notificado al administrador principal para que otorgue los permisos correspondientes y clasifique tu perfil.',
-          style: TextStyle(color: Colors.white70),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Entendido', style: TextStyle(color: Color(0xFFD4AF37))),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showMessage(String message) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
-  }
-
-  @override
+new_ui = """  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -472,3 +282,9 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
     );
   }
 }
+"""
+
+content = content[:build_start] + new_ui
+
+with open(file_path, "w") as f:
+    f.write(content)

@@ -39,6 +39,9 @@ class _ClientDashboardInitialPageState
   final NotificationService _notificationService = NotificationService.instance;
   final RealtimeService _realtimeService = RealtimeService.instance;
 
+  int _selectedHours = 2;
+  final double _hourlyRate = 57.96;
+
   @override
   void initState() {
     super.initState();
@@ -186,11 +189,11 @@ class _ClientDashboardInitialPageState
           Row(
             children: [
               const Text(
-                "MAXIMUS",
+                "MAXIMUS LEVEL GROUP",
                 style: TextStyle(
                   color: Colors.black, 
                   fontWeight: FontWeight.w900, 
-                  fontSize: 24, 
+                  fontSize: 18, 
                   letterSpacing: -1.0,
                 ),
               ),
@@ -555,6 +558,7 @@ class _ClientDashboardInitialPageState
     return Align(
       alignment: Alignment.bottomCenter,
       child: Container(
+        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.85),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
@@ -588,10 +592,18 @@ class _ClientDashboardInitialPageState
                 ),
               ),
               const SizedBox(height: 16),
-              _buildPanelContent(),
-              const SizedBox(height: 24),
-              _buildSuggestionsGrid(),
-              const SizedBox(height: 24),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      _buildPanelContent(),
+                      const SizedBox(height: 24),
+                      _buildSuggestionsGrid(),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -653,25 +665,11 @@ class _ClientDashboardInitialPageState
           style: TextStyle(fontSize: 34, fontWeight: FontWeight.w800, letterSpacing: -1, color: Colors.black),
         ),
         const SizedBox(height: 24),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: const Color(0xFFE8F5E9), // Light green tint
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.local_offer, color: Colors.green, size: 16),
-              const SizedBox(width: 8),
-              const Expanded(child: Text("20% de descuento en 1 viaje de hasta...", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.green))),
-              Icon(Icons.info_outline, color: Colors.green.withValues(alpha: 0.5), size: 16)
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
         _buildLocationInputs(),
         const SizedBox(height: 24),
         _buildBlackButton("Buscar"),
+        const SizedBox(height: 40),
+        _buildRentalContent(),
       ],
     );
   }
@@ -705,18 +703,28 @@ class _ClientDashboardInitialPageState
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             InkWell(
-               child: Container(padding: const EdgeInsets.all(8), decoration: const BoxDecoration(color: Color(0xFFF3F3F3), shape: BoxShape.circle), child: const Icon(Icons.remove, size: 24, color: Colors.black38)),
+               onTap: () {
+                 if (_selectedHours > 2) {
+                   setState(() => _selectedHours--);
+                 }
+               },
+               child: Container(padding: const EdgeInsets.all(8), decoration: const BoxDecoration(color: Color(0xFFF3F3F3), shape: BoxShape.circle), child: Icon(Icons.remove, size: 24, color: _selectedHours > 2 ? Colors.black : Colors.black38)),
             ),
             const SizedBox(width: 32),
-            const Text("2 horas", style: TextStyle(fontSize: 36, fontWeight: FontWeight.w800)),
+            Text("$_selectedHours horas", style: const TextStyle(fontSize: 36, fontWeight: FontWeight.w800)),
             const SizedBox(width: 32),
             InkWell(
-               child: Container(padding: const EdgeInsets.all(8), decoration: const BoxDecoration(color: Color(0xFFF3F3F3), shape: BoxShape.circle), child: const Icon(Icons.add, size: 24, color: Colors.black)),
+               onTap: () {
+                 if (_selectedHours < 12) {
+                   setState(() => _selectedHours++);
+                 }
+               },
+               child: Container(padding: const EdgeInsets.all(8), decoration: const BoxDecoration(color: Color(0xFFF3F3F3), shape: BoxShape.circle), child: Icon(Icons.add, size: 24, color: _selectedHours < 12 ? Colors.black : Colors.black38)),
             ),
           ],
         ),
         const SizedBox(height: 12),
-        const Center(child: Text("Incluido: 40 millas", style: TextStyle(color: Colors.black54, fontSize: 14))),
+        Center(child: Text("Incluido: ${_selectedHours * 20} millas", style: const TextStyle(color: Colors.black54, fontSize: 14))),
         const SizedBox(height: 40),
         
         // Fake Slider
@@ -745,8 +753,8 @@ class _ClientDashboardInitialPageState
              Column(
                crossAxisAlignment: CrossAxisAlignment.end,
                children: [
-                  const Text("115,92 US\$", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20)),
-                  Text("57,96 US\$/hora", style: TextStyle(color: Colors.black54, fontSize: 13, decoration: TextDecoration.lineThrough)),
+                   Text("${(_hourlyRate * _selectedHours).toStringAsFixed(2)} US\$", style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 20)),
+                   Text("${_hourlyRate.toStringAsFixed(2)} US\$/hora", style: const TextStyle(color: Colors.black54, fontSize: 13, decoration: TextDecoration.lineThrough)),
                ],
              )
           ],
@@ -956,7 +964,7 @@ class _ClientDashboardInitialPageState
               children: [
                 Icon(Icons.access_time_filled, size: 16, color: Colors.black),
                 SizedBox(width: 8),
-                Text("Pedir para llevar ahora", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 13)),
+                Text("Ahora", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 13)),
                 SizedBox(width: 4),
                 Icon(Icons.keyboard_arrow_down, size: 16, color: Colors.black),
               ],
@@ -997,7 +1005,7 @@ class _ClientDashboardInitialPageState
             children: [
                Icon(Icons.access_time_filled, size: 16, color: Colors.black),
                SizedBox(width: 16),
-               Expanded(child: Text("Recoger ya", style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w600))),
+               Expanded(child: Text("Viajar ahora", style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w600))),
                Icon(Icons.keyboard_arrow_down, size: 20, color: Colors.black),
             ],
           )

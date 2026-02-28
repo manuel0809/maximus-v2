@@ -283,4 +283,14 @@ class NotificationService {
       throw Exception('Error al crear notificación de prueba: $e');
     }
   }
+  /// Send a local welcome notification
+  Future<void> sendWelcomeNotification(String? userName) async {
+    final name = userName ?? 'Usuario';
+    _platform.showNotification(
+      id: 9999,
+      title: '¡Bienvenido a Maximus Level Group!',
+      body: 'Hola $name, gracias por unirte a nuestra plataforma de transporte de lujo.',
+      payload: 'welcome_notification',
+    );
+  }
 }

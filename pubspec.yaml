@@ -45,6 +45,8 @@ dependencies:
   latlong2: any
   flutter_map: any
   universal_html: ^2.2.4
+  firebase_core: ^4.4.0
+  firebase_messaging: ^16.1.1
 
 dev_dependencies:
   flutter_test:    # CRITICAL: Required for Flutter project testing - DO NOT REMOVE
