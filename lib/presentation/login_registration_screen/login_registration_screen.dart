@@ -5,6 +5,7 @@ import '../../services/user_service.dart';
 import '../../services/notification_service.dart';
 import '../../core/constants/app_roles.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 /// Modern authentication screen with tabbed interface for login and registration
 class LoginRegistrationScreen extends StatefulWidget {
@@ -207,22 +208,36 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: const Text(
-          'MAXIMUS',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 2.0,
-          ),
-        ),
-        centerTitle: false,
+        backgroundColor: Colors.white,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "MAXIMUS LEVEL GROUP",
+              style: GoogleFonts.lexend(
+                color: Colors.black,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.0,
+              ),
+            ),
+            Image.asset(
+              'assets/images/maximus_official_logo.png',
+              height: 40,
+              errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+            ),
+          ],
+        ),
       ),
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+          child: Center(
             child: Container(
               constraints: const BoxConstraints(maxWidth: 400),
               child: _isOtpSent ? _buildOtpForm() : _buildEmailForm(),
@@ -337,17 +352,6 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
           onPressed: _loading ? () {} : () => _signInWithOAuth(OAuthProvider.apple),
         ),
         
-        SizedBox(height: 1.5.h),
-        
-        // QR Button (Placeholder)
-        _buildSocialButton(
-          icon: Icons.qr_code_scanner,
-          text: 'Inicia sesión con el código QR',
-          onPressed: () {
-            _showMessage('Próximamente');
-          },
-        ),
-
         SizedBox(height: 4.h),
         Text(
           'Al continuar, aceptas recibir llamadas, incluidas las realizadas con marcadores automáticos, mensajes de WhatsApp o SMS de Maximus y sus afiliados.',
@@ -363,19 +367,6 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
-            padding: EdgeInsets.zero,
-            alignment: Alignment.centerLeft,
-            onPressed: () {
-              setState(() {
-                _isOtpSent = false;
-              });
-            },
-          ),
-        ),
         SizedBox(height: 2.h),
         Text(
           'Introduce el código de 6 dígitos que te hemos enviado a ${_emailController.text}',
@@ -404,7 +395,7 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
         ),
         SizedBox(height: 4.h),
 
-        // OTP Field (Simple text field for now, styled like Uber)
+        // OTP Field
         Container(
           decoration: BoxDecoration(
             color: const Color(0xFFF3F3F3),

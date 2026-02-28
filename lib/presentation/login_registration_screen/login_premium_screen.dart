@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../routes/app_routes.dart';
 
 class LoginPremiumScreen extends StatelessWidget {
   const LoginPremiumScreen({super.key});
@@ -10,11 +9,11 @@ class LoginPremiumScreen extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // 1. FONDO: Imagen de Suburban en Miami de Noche
+          // 1. FONDO: Imagen de SUV de Lujo (Generada localmente)
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: NetworkImage('https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=2000'),
+                image: AssetImage('assets/images/login_bg_luxury.png'),
                 fit: BoxFit.cover,
               ),
             ),
@@ -26,11 +25,11 @@ class LoginPremiumScreen extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.black.withValues(red: 0, green: 0, blue: 0, alpha: 0.2),
-                  Colors.black.withValues(red: 0, green: 0, blue: 0, alpha: 0.6),
+                  Colors.black.withValues(red: 0, green: 0, blue: 0, alpha: 0.3),
+                  Colors.black.withValues(red: 0, green: 0, blue: 0, alpha: 0.7),
                   Colors.black,
                 ],
-                stops: const [0.0, 0.4, 1.0],
+                stops: const [0.0, 0.5, 1.0],
               ),
             ),
           ),
@@ -74,24 +73,23 @@ class LoginPremiumScreen extends StatelessWidget {
 
                   const Spacer(),
 
-                  // BOTÓN DE LOGIN PRINCIPAL
-                  _buildMainButton(context, "Login", Colors.white, Colors.black, () {
-                    // Temporarily navigating directly, but should eventually use proper auth
-                    Navigator.pushNamed(context, AppRoutes.clientDashboard);
+                  // BOTÓN DE LOGIN PRINCIPAL (Ahora lleva al flujo de OTP)
+                  _buildMainButton(context, "Login / Sign up", Colors.white, Colors.black, () {
+                    Navigator.pushNamed(context, '/login-registration-screen-manual');
                   }),
                   
                   const SizedBox(height: 15),
 
                   // BOTÓN APPLE
                   _buildSocialButton(context, "Continue with Apple", Icons.apple, Colors.white, () {
-                    Navigator.pushNamed(context, AppRoutes.clientDashboard);
+                    // Logic handled in auth service
                   }),
                   
                   const SizedBox(height: 12),
 
                   // BOTÓN GOOGLE
                   _buildSocialButton(context, "Continue with Google", Icons.g_mobiledata, Colors.white, () {
-                    Navigator.pushNamed(context, AppRoutes.clientDashboard);
+                    // Logic handled in auth service
                   }),
 
                   const SizedBox(height: 15),
@@ -101,7 +99,6 @@ class LoginPremiumScreen extends StatelessWidget {
                   // TEXTO FINAL
                   TextButton(
                     onPressed: () {
-                      // Allow manual login through the old screen if needed
                       Navigator.pushNamed(context, '/login-registration-screen-manual');
                     },
                     child: Text(

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../routes/app_routes.dart';
-import '../../widgets/custom_bottom_bar.dart';
 import './client_dashboard_initial_page.dart';
 
 class ClientDashboard extends StatefulWidget {
@@ -45,19 +44,6 @@ class ClientDashboardState extends State<ClientDashboard> {
                 );
               }
               return null;
-          }
-        },
-      ),
-      bottomNavigationBar: CustomBottomBar(
-        currentIndex: currentIndex,
-        onTap: (index) {
-          // For the routes that are not in the AppRoutes.routes, do not navigate to them.
-          if (!AppRoutes.routes.containsKey(routes[index])) {
-            return;
-          }
-          if (currentIndex != index) {
-            setState(() => currentIndex = index);
-            navigatorKey.currentState?.pushReplacementNamed(routes[index]);
           }
         },
       ),

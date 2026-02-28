@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/app_export.dart';
 import '../../services/notification_service.dart';
@@ -188,14 +189,20 @@ class _ClientDashboardInitialPageState
           // Logo & Tabs (Desktop)
           Row(
             children: [
-              const Text(
+              Text(
                 "MAXIMUS LEVEL GROUP",
-                style: TextStyle(
-                  color: Colors.black, 
-                  fontWeight: FontWeight.w900, 
-                  fontSize: 18, 
-                  letterSpacing: -1.0,
+                style: GoogleFonts.lexend(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w900,
+                  fontSize: isDesktop ? 18 : 14,
+                  letterSpacing: -0.5,
                 ),
+              ),
+              const SizedBox(width: 12),
+              Image.asset(
+                'assets/images/maximus_official_logo.png',
+                height: isDesktop ? 32 : 24,
+                errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
               ),
               if (isDesktop) ...[
                 const SizedBox(width: 40),

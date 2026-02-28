@@ -57,10 +57,10 @@ dev_dependencies:
 flutter:
   uses-material-design: true # CRITICAL: Required for Material icon font - DO NOT REMOVE
   assets:
-    - assets/
+    - assets/images/login_bg_luxury.png
+    - assets/images/maximus_official_logo.png
     - assets/images/
-    - assets/images/Untitled-1770901021359.jpeg
-    - assets/images/Untitled-1770903998939.jpeg
+    - assets/icons/
     - assets/env.json
   # CRITICAL ASSET MANAGEMENT RULES:
   # - DO NOT ADD NEW ASSET DIRECTORIES (assets/svg/, assets/icons/, etc.)
