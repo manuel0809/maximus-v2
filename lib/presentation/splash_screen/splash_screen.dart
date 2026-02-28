@@ -107,42 +107,42 @@ class _SplashScreenState extends State<SplashScreen>
 
         debugPrint('SplashScreen: Fetching profile for ${user.id}');
         final profile = await UserService.instance.getUserById(user.id);
-          debugPrint('SplashScreen: Profile fetch result: ${profile != null ? "Success" : "Empty"}');
-          if (!mounted) return;
-          
-          final roleStr = profile?['role'] as String?;
-          final role = AppRole.fromString(roleStr);
-          debugPrint('SplashScreen: Determined role: ${role.dbValue}');
+        debugPrint('SplashScreen: Profile fetch result: ${profile != null ? "Success" : "Empty"}');
+        
+        if (!mounted) return;
+        
+        final roleStr = profile?['role'] as String?;
+        final role = AppRole.fromString(roleStr);
+        debugPrint('SplashScreen: Determined role: ${role.dbValue}');
 
-          // --- FLAVOR SECURITY LOGIC ---
-          final bool isStaffBuild = AppConfig.isStaff;
-          final bool userIsStaff = role.isAdmin || role.isAssistant || role.isDriver;
+        // --- FLAVOR SECURITY LOGIC ---
+        final bool isStaffBuild = AppConfig.isStaff;
+        final bool userIsStaff = role.isAdmin || role.isAssistant || role.isDriver;
 
-          if (isStaffBuild && !userIsStaff) {
-            // Un cliente intentando entrar al sitio de Staff
-            _showAccessDenied('Este sitio es exclusivo para personal. Por favor, usa la web de clientes.');
-            return;
-          }
+        if (isStaffBuild && !userIsStaff) {
+          // Un cliente intentando entrar al sitio de Staff
+          _showAccessDenied('Este sitio es exclusivo para personal. Por favor, usa la web de clientes.');
+          return;
+        }
 
-          if (!isStaffBuild && userIsStaff) {
-            // Staff entrando al sitio de clientes (opcionalmente permitido, pero mejor separar)
-            debugPrint('SplashScreen: Staff user on Client site. Proceeding as client UI.');
-          }
-          // ------------------------------
+        if (!isStaffBuild && userIsStaff) {
+          // Staff entrando al sitio de clientes
+          debugPrint('SplashScreen: Staff user on Client site. Proceeding as client UI.');
+        }
+        // ------------------------------
 
-          if (role.isAdmin || role.isAssistant) {
-            debugPrint('SplashScreen: Navigating to Admin Dashboard');
-            Navigator.of(context, rootNavigator: true)
-                .pushReplacementNamed(AppRoutes.adminDashboard);
-          } else if (role.isDriver) {
-            debugPrint('SplashScreen: Navigating to Driver Dashboard');
-            Navigator.of(context, rootNavigator: true)
-                .pushReplacementNamed(AppRoutes.driverDashboard);
-          } else {
-            debugPrint('SplashScreen: Navigating to Client Dashboard');
-            Navigator.of(context, rootNavigator: true)
-                .pushReplacementNamed(AppRoutes.clientDashboard);
-          }
+        if (role.isAdmin || role.isAssistant) {
+          debugPrint('SplashScreen: Navigating to Admin Dashboard');
+          Navigator.of(context, rootNavigator: true)
+              .pushReplacementNamed(AppRoutes.adminDashboard);
+        } else if (role.isDriver) {
+          debugPrint('SplashScreen: Navigating to Driver Dashboard');
+          Navigator.of(context, rootNavigator: true)
+              .pushReplacementNamed(AppRoutes.driverDashboard);
+        } else {
+          debugPrint('SplashScreen: Navigating to Client Dashboard');
+          Navigator.of(context, rootNavigator: true)
+              .pushReplacementNamed(AppRoutes.clientDashboard);
         }
       }
     } catch (e) {
