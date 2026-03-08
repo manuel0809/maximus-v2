@@ -20,7 +20,9 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
   final bool _isLogin = true;
   bool _isOtpSent = false;
   final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   final _otpController = TextEditingController();
+  bool _obscurePassword = true;
   bool _loading = false;
   final _userService = UserService.instance;
 
@@ -32,27 +34,67 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
   @override
   void dispose() {
     _emailController.dispose();
+    _passwordController.dispose();
     _otpController.dispose();
     super.dispose();
   }
 
   Future<void> _handleAuth() async {
     if (!_isOtpSent) {
-      await _sendOtp();
+      await _initiateAuth();
     } else {
       await _verifyOtp();
     }
   }
 
-  Future<void> _sendOtp() async {
-    final contact = _emailController.text.trim();
+  Future<void> _initiateAuth() async {
+    final contact = _emailController.text.trim().replaceAll(RegExp(r'\s+'), '').toLowerCase();
+    final password = _passwordController.text;
+
     if (contact.isEmpty) {
       _showMessage('Por favor ingresa tu correo o número de celular');
       return;
     }
+    
     setState(() => _loading = true);
+
     try {
       final isEmail = contact.contains('@');
+
+      // If password provided, do direct sign in
+      if (password.isNotEmpty) {
+        AuthResponse response;
+        if (isEmail) {
+          response = await SupabaseService.instance.client.auth.signInWithPassword(
+            email: contact,
+            password: password,
+          );
+        } else {
+          response = await SupabaseService.instance.client.auth.signInWithPassword(
+            phone: contact,
+            password: password,
+          );
+        }
+
+        if (response.user != null && mounted) {
+          final roleStr = response.user!.userMetadata?['role'] ?? 'client';
+          final role = AppRole.fromString(roleStr);
+          await _userService.updateLastLogin(response.user!.id);
+          _showMessage('¡Bienvenido de nuevo!');
+
+          if (!mounted) return;
+          if (role == AppRole.admin) {
+            Navigator.of(context).pushReplacementNamed('/admin-dashboard');
+          } else if (role == AppRole.driver) {
+            Navigator.of(context).pushReplacementNamed('/driver-dashboard');
+          } else {
+            Navigator.of(context).pushReplacementNamed('/client-dashboard');
+          }
+        }
+        return; // Stop here if password login succeeds
+      }
+
+      // OTHERWISE: Fallback to OTP flow if password is empty
       if (isEmail) {
         await SupabaseService.instance.client.auth.signInWithOtp(
           email: contact,
@@ -75,7 +117,7 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
   }
 
   Future<void> _verifyOtp() async {
-    final contact = _emailController.text.trim();
+    final contact = _emailController.text.trim().replaceAll(RegExp(r'\s+'), '').toLowerCase();
     final otp = _otpController.text.trim();
     if (otp.isEmpty) {
       _showMessage('Por favor ingresa el código');
@@ -264,7 +306,7 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
         ),
         SizedBox(height: 3.h),
         
-        // Input Field
+        // Email/Phone Input Field
         Container(
           decoration: BoxDecoration(
             color: const Color(0xFFF3F3F3), // Light grey
@@ -287,6 +329,45 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
               ),
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+            ),
+          ),
+        ),
+        SizedBox(height: 2.h),
+
+        // Password Input Field (Optional for OTP but required for direct login)
+        Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFFF3F3F3),
+            borderRadius: BorderRadius.circular(8.0),
+            border: Border.all(color: Colors.transparent),
+          ),
+          child: TextField(
+            controller: _passwordController,
+            obscureText: _obscurePassword,
+            cursorColor: Colors.black,
+            style: TextStyle(
+              fontSize: 12.sp, 
+              color: Colors.black,
+            ),
+            decoration: InputDecoration(
+              hintText: 'Contraseña (opcional para código por SMS/Email)',
+              hintStyle: TextStyle(
+                color: Colors.black54,
+                fontSize: 11.sp,
+              ),
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                  color: Colors.black54,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscurePassword = !_obscurePassword;
+                  });
+                },
+              ),
             ),
           ),
         ),

@@ -52,4 +52,48 @@ class WhatsAppService {
       throw Exception('Could not launch WhatsApp');
     }
   }
+
+  /// Send booking confirmation with driver details
+  Future<void> sendBookingConfirmation({
+    required String userPhone,
+    required String userName,
+    required String bookingId,
+    required String vehicle,
+    required String pickupDate,
+    String? driverName,
+    String? driverPhone,
+    String? driverProfileUrl,
+  }) async {
+    String driverInfo = '';
+    if (driverName != null) {
+      driverInfo = '\n\n👨‍✈️ Su Conductor: $driverName';
+      if (driverPhone != null) {
+        driverInfo += '\n📞 Contacto: $driverPhone';
+      }
+      if (driverProfileUrl != null) {
+        driverInfo += '\n👤 Perfil: $driverProfileUrl';
+      }
+    }
+
+    final String message = Uri.encodeComponent(
+      '🌟 *Confirmación de Reserva Maximus*\n\n'
+      'Hola $userName,\n'
+      'Es un placer confirmarle que su reserva *$bookingId* está lista.\n\n'
+      '🚗 *Vehículo:* $vehicle\n'
+      '📅 *Fecha:* $pickupDate$driverInfo\n\n'
+      'Gracias por elegir la excelencia.\n'
+      '— *Maximus Level Group*'
+    );
+
+    if (userPhone.isEmpty) return;
+
+    final cleanPhone = userPhone.replaceAll(RegExp(r'\D'), '');
+    final Uri whatsappUri = Uri.parse('https://wa.me/$cleanPhone?text=$message');
+
+    if (await canLaunchUrl(whatsappUri)) {
+      await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
+    } else {
+      throw Exception('Could not launch WhatsApp');
+    }
+  }
 }

@@ -121,10 +121,12 @@ class FinanceService {
         totalRev += (r['total_price'] ?? 0).toDouble();
       }
 
+      final netProfit = totalRev - totalExp;
+
       return {
         'total_income': totalRev,
         'total_expenses': totalExp,
-        'net_profit': totalRev - totalExp,
+        'net_profit': netProfit,
         'expenses_breakdown': breakdown,
       };
     } catch (e) {

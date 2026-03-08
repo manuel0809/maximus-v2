@@ -8,6 +8,7 @@ class BookingRequestCardWidget extends StatelessWidget {
   final VoidCallback onReject;
   final VoidCallback? onChecklistPickup;
   final VoidCallback? onChecklistReturn;
+  final VoidCallback? onExportCalendar;
 
   const BookingRequestCardWidget({
     super.key,
@@ -17,6 +18,7 @@ class BookingRequestCardWidget extends StatelessWidget {
     required this.onReject,
     this.onChecklistPickup,
     this.onChecklistReturn,
+    this.onExportCalendar,
   });
 
   @override
@@ -66,7 +68,18 @@ class BookingRequestCardWidget extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  _buildPriorityBadge(theme, priority),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (onExportCalendar != null)
+                        IconButton(
+                          icon: Icon(Icons.calendar_month, size: 20, color: theme.colorScheme.primary),
+                          onPressed: onExportCalendar,
+                          tooltip: 'Añadir al Calendario',
+                        ),
+                      _buildPriorityBadge(theme, priority),
+                    ],
+                  ),
                   const SizedBox(height: 8.0),
                   _buildStatusBadge(theme, status),
                 ],

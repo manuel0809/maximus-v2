@@ -6,10 +6,18 @@ import '../../services/google_maps_service.dart' as gms;
 /// Client booking map widget for selecting pickup/dropoff and viewing route
 class ClientBookingMapWidget extends StatefulWidget {
   final Function(gms.LatLng pickup, gms.LatLng dropoff, double miles, int minutes)? onRouteCalculated;
+  final gms.LatLng? externalPickup;
+  final gms.LatLng? externalDropoff;
+  final gms.LatLng? externalStop;
+  final bool showControls;
 
   const ClientBookingMapWidget({
     super.key,
     this.onRouteCalculated,
+    this.externalPickup,
+    this.externalDropoff,
+    this.externalStop,
+    this.showControls = true,
   });
 
   @override
@@ -33,6 +41,43 @@ class _ClientBookingMapWidgetState extends State<ClientBookingMapWidget> {
   List<gms.PlacePrediction> _searchResults = [];
 
   @override
+  void initState() {
+    super.initState();
+    _pickupLocation = widget.externalPickup;
+    _dropoffLocation = widget.externalDropoff;
+    _updateMarkers();
+    if (_pickupLocation != null && _dropoffLocation != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _calculateRoute());
+    }
+  }
+
+  @override
+  void didUpdateWidget(ClientBookingMapWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    bool changed = false;
+    if (widget.externalPickup != oldWidget.externalPickup) {
+      _pickupLocation = widget.externalPickup;
+      changed = true;
+    }
+    if (widget.externalDropoff != oldWidget.externalDropoff) {
+      _dropoffLocation = widget.externalDropoff;
+      changed = true;
+    }
+    
+    if (changed) {
+      _updateMarkers();
+      if (_pickupLocation != null && _dropoffLocation != null) {
+        _calculateRoute();
+      } else {
+        setState(() {
+          _polylines.clear();
+          _routeInfo = null;
+        });
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
@@ -52,15 +97,16 @@ class _ClientBookingMapWidgetState extends State<ClientBookingMapWidget> {
         ),
 
         // Search bar
-        Positioned(
-          top: 16,
-          left: 16,
-          right: 16,
-          child: _buildSearchBar(),
-        ),
+        if (widget.showControls)
+          Positioned(
+            top: 16,
+            left: 16,
+            right: 16,
+            child: _buildSearchBar(),
+          ),
 
         // Route info card
-        if (_routeInfo != null)
+        if (_routeInfo != null && widget.showControls)
           Positioned(
             bottom: 16,
             left: 16,
@@ -206,7 +252,7 @@ class _ClientBookingMapWidgetState extends State<ClientBookingMapWidget> {
       _markers.add(Marker(
         markerId: const MarkerId('pickup'),
         position: LatLng(_pickupLocation!.latitude, _pickupLocation!.longitude),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure), // Premium Blue/Black
         infoWindow: const InfoWindow(title: 'Punto de Recogida'),
       ));
     }
@@ -246,7 +292,7 @@ class _ClientBookingMapWidgetState extends State<ClientBookingMapWidget> {
         _polylines.add(Polyline(
           polylineId: const PolylineId('route'),
           points: _polylineCoordinates,
-          color: Colors.blue,
+          color: Colors.black, // Premium Uber Look
           width: 5,
         ));
       });

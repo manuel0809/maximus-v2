@@ -16,6 +16,8 @@ class AdminSummaryDashboardScreen extends StatefulWidget {
 class _AdminSummaryDashboardScreenState extends State<AdminSummaryDashboardScreen> {
   final AdminService _adminService = AdminService.instance;
   Map<String, dynamic>? stats;
+  List<Map<String, dynamic>> frequentRoutes = [];
+  List<Map<String, dynamic>> recurringClients = [];
   bool isLoading = true;
 
   @override
@@ -27,9 +29,14 @@ class _AdminSummaryDashboardScreenState extends State<AdminSummaryDashboardScree
   Future<void> _loadStats() async {
     try {
       final dashboardStats = await _adminService.getDashboardStats();
+      final routes = await _adminService.getFrequentRoutes();
+      final clients = await _adminService.getRecurringClients();
+      
       if (mounted) {
         setState(() {
           stats = dashboardStats;
+          frequentRoutes = routes;
+          recurringClients = clients;
           isLoading = false;
         });
       }
@@ -118,6 +125,18 @@ class _AdminSummaryDashboardScreenState extends State<AdminSummaryDashboardScree
                     // Automation Toolbar
                     _buildAutomationToolbar(theme),
                     SizedBox(height: 4.h),
+
+                    // Frequent Routes Section
+                    if (frequentRoutes.isNotEmpty) ...[
+                      _buildFrequentRoutesSection(theme),
+                      SizedBox(height: 4.h),
+                    ],
+
+                    // Recurring Clients Section
+                    if (recurringClients.isNotEmpty) ...[
+                      _buildRecurringClientsSection(theme),
+                      SizedBox(height: 4.h),
+                    ],
 
                     // Fleet Summary
                     _buildFleetSummarySection(theme),
@@ -237,6 +256,107 @@ class _AdminSummaryDashboardScreenState extends State<AdminSummaryDashboardScree
           style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: color),
         ),
         Text(label, style: TextStyle(fontSize: 10.sp, color: Colors.grey)),
+      ],
+    );
+  }
+
+  Widget _buildFrequentRoutesSection(ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Rutas más Frecuentes',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        SizedBox(height: 2.h),
+        PremiumCard(
+          borderRadius: 16,
+          padding: EdgeInsets.zero,
+          child: Column(
+            children: frequentRoutes.map((route) {
+              return ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: theme.primaryColor.withValues(alpha: 0.1),
+                  child: Icon(Icons.route_outlined, color: theme.primaryColor, size: 20),
+                ),
+                title: Text(
+                  route['route'] ?? 'Ruta desconocida',
+                  style: TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w600),
+                ),
+                subtitle: Text(
+                  '${route['count']} reservas completadas',
+                  style: TextStyle(fontSize: 9.sp, color: Colors.grey),
+                ),
+                trailing: Icon(Icons.chevron_right, color: Colors.grey, size: 16),
+              );
+            }).toList(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRecurringClientsSection(ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Clientes VIP (Recurrentes)',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        SizedBox(height: 2.h),
+        SizedBox(
+          height: 12.h,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: recurringClients.length,
+            itemBuilder: (context, index) {
+              final client = recurringClients[index];
+              final rentals = (client['rentals'] as List?)?.length ?? 0;
+              
+              return Container(
+                width: 40.w,
+                margin: EdgeInsets.only(right: 4.w),
+                child: PremiumCard(
+                  borderRadius: 12,
+                  padding: EdgeInsets.all(2.w),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 18,
+                        backgroundImage: client['avatar_url'] != null 
+                            ? NetworkImage(client['avatar_url']) 
+                            : null,
+                        child: client['avatar_url'] == null 
+                            ? Icon(Icons.person, size: 18, color: Colors.white) 
+                            : null,
+                      ),
+                      SizedBox(width: 2.w),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              client['full_name'] ?? 'Cliente',
+                              style: TextStyle(fontSize: 9.sp, fontWeight: FontWeight.bold),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              '$rentals viajes',
+                              style: TextStyle(fontSize: 8.sp, color: theme.primaryColor),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
       ],
     );
   }

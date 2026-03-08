@@ -5,6 +5,7 @@ import '../../../services/user_service.dart';
 import '../../../widgets/custom_app_bar.dart';
 import '../widgets/booking_request_card_widget.dart';
 import '../widgets/additional_charges_dialog.dart';
+import '../../../services/calendar_service.dart';
 
 class ReservationsAdminScreen extends StatefulWidget {
   const ReservationsAdminScreen({super.key});
@@ -78,8 +79,15 @@ class _ReservationsAdminScreenState extends State<ReservationsAdminScreen> {
                        // Logic to modify dates/vehicle
                     },
                     onReject: () => _carService.updateRentalStatus(rental['id'], 'cancelled').then((_) => _loadRentals()),
-                    onChecklistPickup: rental['status'] == 'confirmed' ? () {} : null,
                     onChecklistReturn: rental['status'] == 'active' ? () => _showChargesDialog(rental) : null,
+                    onExportCalendar: () {
+                      CalendarService.instance.addToCalendar(
+                        title: 'Reserva Maximus: ${booking['vehicle']}',
+                        description: 'Cliente: ${booking['clientName']}\nID: ${booking['id']}\nServicio: ${booking['service']}',
+                        location: rental['pickup_location'] ?? 'Ubicación de recogida',
+                        pickupDate: DateTime.parse(rental['pickup_date']),
+                      );
+                    },
                   ),
                 );
               },

@@ -2,12 +2,44 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:sizer/sizer.dart';
 import '../../../widgets/premium_card.dart';
+import '../../../services/admin_service.dart';
 
-class AnalyticsChartWidget extends StatelessWidget {
+class AnalyticsChartWidget extends StatefulWidget {
   const AnalyticsChartWidget({super.key});
 
   @override
+  State<AnalyticsChartWidget> createState() => _AnalyticsChartWidgetState();
+}
+
+class _AnalyticsChartWidgetState extends State<AnalyticsChartWidget> {
+  List<Map<String, dynamic>> chartData = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    try {
+      final data = await AdminService.instance.getRevenueChartData();
+      if (mounted) {
+        setState(() {
+          chartData = data;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) setState(() => isLoading = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (isLoading) return const Center(child: CircularProgressIndicator());
+    if (chartData.isEmpty) return const Center(child: Text('Sin datos disponibles'));
+    
     final theme = Theme.of(context);
 
     return PremiumCard(
@@ -123,14 +155,9 @@ class AnalyticsChartWidget extends StatelessWidget {
                 maxY: 100,
                 lineBarsData: [
                   LineChartBarData(
-                    spots: [
-                      FlSpot(0, 45),
-                      FlSpot(1, 52),
-                      FlSpot(2, 48),
-                      FlSpot(3, 65),
-                      FlSpot(4, 72),
-                      FlSpot(5, 85),
-                    ],
+                    spots: chartData.asMap().entries.map((e) {
+                      return FlSpot(e.key.toDouble(), (e.value['revenue'] ?? 0).toDouble());
+                    }).toList(),
                     isCurved: true,
                     color: const Color(0xFF8B1538),
                     barWidth: 3,
@@ -139,24 +166,6 @@ class AnalyticsChartWidget extends StatelessWidget {
                     belowBarData: BarAreaData(
                       show: true,
                       color: const Color(0xFF8B1538).withValues(alpha: 0.1),
-                    ),
-                  ),
-                  LineChartBarData(
-                    spots: [
-                      FlSpot(0, 30),
-                      FlSpot(1, 38),
-                      FlSpot(2, 42),
-                      FlSpot(3, 55),
-                      FlSpot(4, 68),
-                      FlSpot(5, 78),
-                    ],
-                    isCurved: true,
-                    color: const Color(0xFF2E7D32),
-                    barWidth: 3,
-                    dotData: FlDotData(show: true),
-                    belowBarData: BarAreaData(
-                      show: true,
-                      color: const Color(0xFF2E7D32).withValues(alpha: 0.1),
                     ),
                   ),
                 ],

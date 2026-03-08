@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../widgets/custom_app_bar.dart';
+import '../../core/constants/app_constants.dart';
 
 class ActiveRentalDashboard extends StatefulWidget {
   final Map<String, dynamic> rental;
@@ -20,7 +21,7 @@ class _ActiveRentalDashboardState extends State<ActiveRentalDashboard> {
   }
 
   Future<void> _openSupportChat() async {
-    final Uri whatsappUri = Uri.parse('https://wa.me/1234567890'); // From AppConstants
+    final Uri whatsappUri = Uri.parse('https://wa.me/${AppConstants.supportWhatsApp}');
     await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
   }
 

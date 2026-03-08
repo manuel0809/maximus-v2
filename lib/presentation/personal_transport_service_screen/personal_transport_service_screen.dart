@@ -11,6 +11,8 @@ import './widgets/transport_pricing_widget.dart';
 import '../../widgets/mapbox_location_picker_widget.dart';
 import '../../widgets/premium_card.dart';
 import '../../services/hourly_service.dart';
+import '../../widgets/maps/client_booking_map_widget.dart';
+import '../../services/google_maps_service.dart' as gms;
 
 class PersonalTransportServiceScreen extends StatefulWidget {
   const PersonalTransportServiceScreen({super.key});
@@ -151,398 +153,466 @@ class _PersonalTransportServiceScreenState
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: CustomAppBar(title: 'Transporte Personal BLACK'),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(4.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Region Selection
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Región de Servicio',
-                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final bool isDesktop = constraints.maxWidth > 900;
+          
+          if (isDesktop) {
+            return Row(
+              children: [
+                // 40% Sidebar Form
+                SizedBox(
+                  width: constraints.maxWidth * 0.4,
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: EdgeInsets.all(2.w),
+                      child: _buildBookingForm(theme),
+                    ),
                   ),
-                  SegmentedButton<String>(
-                    segments: const [
-                      ButtonSegment(value: 'miami_broward', label: Text('Miami/Broward')),
-                      ButtonSegment(value: 'orlando', label: Text('Orlando')),
-                    ],
-                    selected: {selectedRegion},
-                    onSelectionChanged: (newSelection) {
-                      setState(() {
-                        selectedRegion = newSelection.first;
-                        _calculatePriceEstimate();
-                      });
-                    },
-                  ),
-                ],
-              ),
-              SizedBox(height: 3.h),
-              
-              // Service Type Selection
-              Text(
-                'Selecciona el Servicio BLACK',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: theme.colorScheme.onSurface,
                 ),
-              ),
-              SizedBox(height: 2.h),
-              ...serviceTypes.map((service) {
-                return ServiceTypeCardWidget(
-                  service: service,
-                  isSelected: selectedServiceType == service['id'],
-                  isAdmin: isAdmin,
-                  onTap: () {
-                    setState(() {
-                      selectedServiceType = service['id'] as String;
-                      serviceDurationHours = 4; // Reset to 4h minimum for hourly
-                      estimatedPrice = null;
-                      distanceMiles = null;
-                      _calculatePriceEstimate();
-                    });
-                  },
-                );
-              }),
-              
-              if (selectedServiceType == 'black_hourly') ...[
-                SizedBox(height: 3.h),
-                Text(
-                  'Vehículo Premium Requerido',
-                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                // 60% Fixed Map
+                Expanded(
+                  child: _buildMapSection(),
                 ),
-                SizedBox(height: 1.5.h),
-                _buildHourlyVehicleSelector(theme),
               ],
+            );
+          } else {
+            // Mobile: Background Map + Slidable Sheet
+            return Stack(
+              children: [
+                _buildMapSection(),
+                DraggableScrollableSheet(
+                  initialChildSize: 0.4,
+                  minChildSize: 0.15,
+                  maxChildSize: 0.85,
+                  builder: (context, scrollController) {
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surface,
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 10,
+                            offset: const Offset(0, -5),
+                          ),
+                        ],
+                      ),
+                      child: ListView(
+                        controller: scrollController,
+                        padding: EdgeInsets.all(4.w),
+                        children: [
+                          Center(
+                            child: Container(
+                              width: 40,
+                              height: 5,
+                              margin: const EdgeInsets.only(bottom: 20),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.outline.withValues(alpha: 0.3),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
+                          _buildBookingForm(theme),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ],
+            );
+          }
+        },
+      ),
+    );
+  }
 
-              /* Price Table Removed */
+  Widget _buildMapSection() {
+    return ClientBookingMapWidget(
+      showControls: false,
+      externalPickup: pickupLat != null && pickupLng != null 
+          ? gms.LatLng(pickupLat!, pickupLng!) 
+          : null,
+      externalDropoff: dropoffLat != null && dropoffLng != null 
+          ? gms.LatLng(dropoffLat!, dropoffLng!) 
+          : null,
+    );
+  }
 
-              if (selectedServiceType != null) ...[
-                SizedBox(height: 3.h),
+  Widget _buildBookingForm(ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Region Selection
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Región de Servicio',
+              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            SegmentedButton<String>(
+              segments: const [
+                ButtonSegment(value: 'miami_broward', label: Text('Miami/Broward')),
+                ButtonSegment(value: 'orlando', label: Text('Orlando')),
+              ],
+              selected: {selectedRegion},
+              onSelectionChanged: (newSelection) {
+                setState(() {
+                  selectedRegion = newSelection.first;
+                  _calculatePriceEstimate();
+                });
+              },
+            ),
+          ],
+        ),
+        SizedBox(height: 3.h),
+        
+        // Service Type Selection
+        Text(
+          'Selecciona el Servicio BLACK',
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+        SizedBox(height: 2.h),
+        ...serviceTypes.map((service) {
+          return ServiceTypeCardWidget(
+            service: service,
+            isSelected: selectedServiceType == service['id'],
+            isAdmin: isAdmin,
+            onTap: () {
+              setState(() {
+                selectedServiceType = service['id'] as String;
+                serviceDurationHours = 4; // Reset to 4h minimum for hourly
+                estimatedPrice = null;
+                distanceMiles = null;
+                _calculatePriceEstimate();
+              });
+            },
+          );
+        }),
+        
+        if (selectedServiceType == 'black_hourly') ...[
+          SizedBox(height: 3.h),
+          Text(
+            'Vehículo Premium Requerido',
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 1.5.h),
+          _buildHourlyVehicleSelector(theme),
+        ],
 
-                // Route Planning
-                Text(
-                  selectedServiceType == 'black_por_hora'
-                      ? 'Punto de Inicio y Duración'
-                      : 'Destino de Recogida y Destino Final',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: theme.colorScheme.onSurface,
+        if (selectedServiceType != null) ...[
+          SizedBox(height: 3.h),
+
+          // Route Planning
+          Text(
+            selectedServiceType == 'black_por_hora'
+                ? 'Punto de Inicio y Duración'
+                : 'Destino de Recogida y Destino Final',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+          SizedBox(height: 2.h),
+          RoutePlannerWidget(
+            pickupLocation: pickupLocation,
+            dropoffLocation: dropoffLocation,
+            stopLocation: stopLocation,
+            hasStop: hasStop,
+            serviceDate: serviceDate,
+            serviceTime: serviceTime,
+            onPickupLocationChanged: (value, lat, lng) {
+              setState(() {
+                pickupLocation = value;
+                final isAirport = value.toLowerCase().contains('airport') || 
+                                value.toLowerCase().contains('aeropuerto') ||
+                                ['mia', 'fll', 'pbi', 'mco'].any((code) => value.toLowerCase().contains(code));
+                if (isAirport) isAirportService = true;
+                
+                if (lat != null && lng != null) {
+                  pickupCoordinates = {'latitude': lat, 'longitude': lng};
+                  pickupLat = lat;
+                  pickupLng = lng;
+                } else {
+                  pickupCoordinates = DistanceCalculatorService.getCoordinatesForLocation(value);
+                  if (pickupCoordinates != null) {
+                      pickupLat = pickupCoordinates!['latitude'];
+                      pickupLng = pickupCoordinates!['longitude'];
+                  }
+                }
+                _calculatePriceEstimate();
+              });
+            },
+            onDropoffLocationChanged: (value, lat, lng) {
+              setState(() {
+                dropoffLocation = value;
+                final isAirport = value.toLowerCase().contains('airport') || 
+                                value.toLowerCase().contains('aeropuerto') ||
+                                ['mia', 'fll', 'pbi', 'mco'].any((code) => value.toLowerCase().contains(code));
+                if (isAirport) isAirportService = true;
+
+                if (lat != null && lng != null) {
+                  dropoffCoordinates = {'latitude': lat, 'longitude': lng};
+                  dropoffLat = lat;
+                  dropoffLng = lng;
+                } else {
+                  dropoffCoordinates = DistanceCalculatorService.getCoordinatesForLocation(value);
+                  if (dropoffCoordinates != null) {
+                      dropoffLat = dropoffCoordinates!['latitude'];
+                      dropoffLng = dropoffCoordinates!['longitude'];
+                  }
+                }
+                _calculatePriceEstimate();
+              });
+            },
+            onStopLocationChanged: (value, lat, lng) {
+              setState(() {
+                stopLocation = value;
+                if (lat != null && lng != null) {
+                  stopCoordinates = {'latitude': lat, 'longitude': lng};
+                  stopLat = lat;
+                  stopLng = lng;
+                } else {
+                  stopCoordinates =
+                      DistanceCalculatorService.getCoordinatesForLocation(
+                        value,
+                      );
+                  if (stopCoordinates != null) {
+                      stopLat = stopCoordinates!['latitude'];
+                      stopLng = stopCoordinates!['longitude'];
+                  }
+                }
+                _calculatePriceEstimate();
+              });
+            },
+            onToggleStop: (value) {
+              setState(() {
+                hasStop = value;
+                if (!value) {
+                  stopLocation = '';
+                  stopCoordinates = null;
+                  stopLat = null;
+                  stopLng = null;
+                } else {
+                  currentSelectionMode = MapSelectionMode.stop;
+                }
+                _calculatePriceEstimate();
+              });
+            },
+            onDateSelected: (date) {
+              setState(() {
+                serviceDate = date;
+                _calculatePriceEstimate();
+              });
+            },
+            onTimeSelected: (time) {
+              setState(() {
+                serviceTime = time;
+                _calculatePriceEstimate();
+              });
+            },
+          ),
+
+          SizedBox(height: 3.h),
+
+          // Booking Details
+          Text(
+            'Detalles de la Reserva',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+          SizedBox(height: 2.h),
+          BookingDetailsWidget(
+            serviceType: selectedServiceType!,
+            passengerCount: passengerCount,
+            specialRequirements: specialRequirements,
+            airportServices: {},
+            isGroupBooking: false,
+            groupSize: 1,
+            needsReturnTrip: false,
+            serviceDurationHours: serviceDurationHours,
+            onPassengerCountChanged: (value) {
+              setState(() {
+                passengerCount = value;
+                _calculatePriceEstimate();
+              });
+            },
+            onServiceDurationChanged: (value) {
+              setState(() {
+                serviceDurationHours = value;
+                _calculatePriceEstimate();
+              });
+            },
+            onSpecialRequirementsChanged: (value) {
+              setState(() => specialRequirements = value);
+            },
+            onAirportServiceChanged: (key, value) {},
+            onGroupBookingChanged: (value) {},
+            onGroupSizeChanged: (value) {
+              setState(() {
+                groupSize = value;
+                _calculatePriceEstimate();
+              });
+            },
+            onReturnTripChanged: (value) {},
+            onCouponApplied: (coupon) {
+              setState(() {
+                appliedCouponCode = coupon['code'];
+                discountPercentage = (coupon['discount_percentage'] ?? 0.0) / 100.0;
+                _calculatePriceEstimate();
+              });
+            },
+          ),
+
+          // Airport Service Option
+          if (selectedServiceType == 'black' ||
+              selectedServiceType == 'black_suv') ...[
+            SizedBox(height: 2.h),
+            PremiumCard(
+              padding: EdgeInsets.all(4.w),
+              borderRadius: 16,
+              useGlassmorphism: true,
+              opacity: 0.03,
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(2.w),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      Icons.flight_takeoff,
+                      color: theme.colorScheme.primary,
+                      size: 22,
+                    ),
                   ),
-                ),
-                SizedBox(height: 2.h),
-                RoutePlannerWidget(
-                  pickupLocation: pickupLocation,
-                  dropoffLocation: dropoffLocation,
-                  stopLocation: stopLocation,
-                  hasStop: hasStop,
-                  serviceDate: serviceDate,
-                  serviceTime: serviceTime,
-                  onPickupLocationChanged: (value, lat, lng) {
-                    setState(() {
-                      pickupLocation = value;
-                      final isAirport = value.toLowerCase().contains('airport') || 
-                                      value.toLowerCase().contains('aeropuerto') ||
-                                      ['mia', 'fll', 'pbi', 'mco'].any((code) => value.toLowerCase().contains(code));
-                      if (isAirport) isAirportService = true;
-                      
-                      if (lat != null && lng != null) {
-                        pickupCoordinates = {'latitude': lat, 'longitude': lng};
-                        pickupLat = lat;
-                        pickupLng = lng;
-                      } else {
-                        pickupCoordinates = DistanceCalculatorService.getCoordinatesForLocation(value);
-                        if (pickupCoordinates != null) {
-                           pickupLat = pickupCoordinates!['latitude'];
-                           pickupLng = pickupCoordinates!['longitude'];
-                        }
-                      }
-                      _calculatePriceEstimate();
-                    });
-                  },
-                  onDropoffLocationChanged: (value, lat, lng) {
-                    setState(() {
-                      dropoffLocation = value;
-                      final isAirport = value.toLowerCase().contains('airport') || 
-                                      value.toLowerCase().contains('aeropuerto') ||
-                                      ['mia', 'fll', 'pbi', 'mco'].any((code) => value.toLowerCase().contains(code));
-                      if (isAirport) isAirportService = true;
-
-                      if (lat != null && lng != null) {
-                        dropoffCoordinates = {'latitude': lat, 'longitude': lng};
-                        dropoffLat = lat;
-                        dropoffLng = lng;
-                      } else {
-                        dropoffCoordinates = DistanceCalculatorService.getCoordinatesForLocation(value);
-                        if (dropoffCoordinates != null) {
-                           dropoffLat = dropoffCoordinates!['latitude'];
-                           dropoffLng = dropoffCoordinates!['longitude'];
-                        }
-                      }
-                      _calculatePriceEstimate();
-                    });
-                  },
-                  onStopLocationChanged: (value, lat, lng) {
-                    setState(() {
-                      stopLocation = value;
-                      if (lat != null && lng != null) {
-                        stopCoordinates = {'latitude': lat, 'longitude': lng};
-                        stopLat = lat;
-                        stopLng = lng;
-                      } else {
-                        stopCoordinates =
-                            DistanceCalculatorService.getCoordinatesForLocation(
-                              value,
-                            );
-                        if (stopCoordinates != null) {
-                           stopLat = stopCoordinates!['latitude'];
-                           stopLng = stopCoordinates!['longitude'];
-                        }
-                      }
-                      _calculatePriceEstimate();
-                    });
-                  },
-                  onToggleStop: (value) {
-                    setState(() {
-                      hasStop = value;
-                      if (!value) {
-                        stopLocation = '';
-                        stopCoordinates = null;
-                        stopLat = null;
-                        stopLng = null;
-                      } else {
-                        currentSelectionMode = MapSelectionMode.stop;
-                      }
-                      _calculatePriceEstimate();
-                    });
-                  },
-                  onPickupTap: () => setState(
-                      () => currentSelectionMode = MapSelectionMode.pickup),
-                  onDropoffTap: () => setState(
-                      () => currentSelectionMode = MapSelectionMode.dropoff),
-                  onStopTap: () => setState(
-                      () => currentSelectionMode = MapSelectionMode.stop),
-                  onDateSelected: (date) {
-                    setState(() {
-                      serviceDate = date;
-                      _calculatePriceEstimate();
-                    });
-                  },
-                  onTimeSelected: (time) {
-                    setState(() {
-                      serviceTime = time;
-                      _calculatePriceEstimate();
-                    });
-                  },
-                ),
-
-                SizedBox(height: 3.h),
-
-              /* Estimated Price Table Removed */
-              SizedBox(height: 3.h),
-
-
-
-                // Booking Details
-                Text(
-                  'Detalles de la Reserva',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-                SizedBox(height: 2.h),
-                BookingDetailsWidget(
-                  serviceType: selectedServiceType!,
-                  passengerCount: passengerCount,
-                  specialRequirements: specialRequirements,
-                  airportServices: {},
-                  isGroupBooking: false,
-                  groupSize: 1,
-                  needsReturnTrip: false,
-                  serviceDurationHours: serviceDurationHours,
-                  onPassengerCountChanged: (value) {
-                    setState(() {
-                      passengerCount = value;
-                      _calculatePriceEstimate();
-                    });
-                  },
-                  onServiceDurationChanged: (value) {
-                    setState(() {
-                      serviceDurationHours = value;
-                      _calculatePriceEstimate();
-                    });
-                  },
-                  onSpecialRequirementsChanged: (value) {
-                    setState(() => specialRequirements = value);
-                  },
-                  onAirportServiceChanged: (key, value) {},
-                  onGroupBookingChanged: (value) {},
-                  onGroupSizeChanged: (value) {
-                    setState(() {
-                      groupSize = value;
-                      _calculatePriceEstimate();
-                    });
-                  },
-                  onReturnTripChanged: (value) {},
-                  onCouponApplied: (coupon) {
-                    setState(() {
-                      appliedCouponCode = coupon['code'];
-                      discountPercentage = (coupon['discount_percentage'] ?? 0.0) / 100.0;
-                      _calculatePriceEstimate();
-                    });
-                  },
-                ),
-
-                // Airport Service Option
-                if (selectedServiceType == 'black' ||
-                    selectedServiceType == 'black_suv') ...[
-                  SizedBox(height: 2.h),
-                  PremiumCard(
-                    padding: EdgeInsets.all(4.w),
-                    borderRadius: 16,
-                    useGlassmorphism: true,
-                    opacity: 0.03,
-                    child: Row(
+                  SizedBox(width: 4.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          padding: EdgeInsets.all(2.w),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(
-                            Icons.flight_takeoff,
-                            color: theme.colorScheme.primary,
-                            size: 22,
+                        Text(
+                          'Servicio de Aeropuerto',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: theme.colorScheme.onSurface,
                           ),
                         ),
-                        SizedBox(width: 4.w),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Servicio de Aeropuerto',
-                                style: theme.textTheme.titleSmall?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                  color: theme.colorScheme.onSurface,
-                                ),
-                              ),
-                              SizedBox(height: 0.2.h),
-                              Text(
-                                selectedServiceType == 'black'
-                                    ? 'Cargo adicional: \$15'
-                                    : 'Cargo adicional: \$20',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ],
+                        SizedBox(height: 0.2.h),
+                        Text(
+                          selectedServiceType == 'black'
+                              ? 'Cargo adicional: \$15'
+                              : 'Cargo adicional: \$20',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
-                        ),
-                        Switch(
-                          value: isAirportService,
-                          onChanged: (value) {
-                            setState(() {
-                              isAirportService = value;
-                              _calculatePriceEstimate();
-                            });
-                          },
-                          activeThumbColor: theme.colorScheme.primary,
                         ),
                       ],
                     ),
                   ),
-                ],
-
-                SizedBox(height: 3.h),
-
-                // Interactive Map with Route
-                if (selectedServiceType != null &&
-                    ((pickupCoordinates != null &&
-                            dropoffCoordinates != null &&
-                            distanceMiles != null &&
-                            durationMinutes != null &&
-                            estimatedPrice != null) ||
-                        (selectedServiceType == 'black_por_hora' &&
-                            estimatedPrice != null) ||
-                        (selectedServiceType == 'black_evento' &&
-                            estimatedPrice != null))) ...[
-                  Text(
-                    'Resumen del Servicio',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: theme.colorScheme.onSurface,
-                    ),
+                  Switch(
+                    value: isAirportService,
+                    onChanged: (value) {
+                      setState(() {
+                        isAirportService = value;
+                        _calculatePriceEstimate();
+                      });
+                    },
+                    activeThumbColor: theme.colorScheme.primary,
                   ),
-                  SizedBox(height: 2.h),
-                  TransportPricingWidget(
-                    distanceMiles: distanceMiles ?? 0.0,
-                    durationMinutes:
-                        durationMinutes ?? serviceDurationHours * 60,
-                    totalPrice: estimatedPrice!,
-                    discountAmount: discountAmount,
-                    isAdmin: isAdmin,
-                    serviceType: selectedServiceType!,
-                    isAirportService: isAirportService,
-                    hourlyBreakdown: _hourlyBreakdown,
-                    serviceDateTime: serviceDate != null && serviceTime != null
-                        ? DateTime(
-                            serviceDate!.year,
-                            serviceDate!.month,
-                            serviceDate!.day,
-                            serviceTime!.hour,
-                            serviceTime!.minute,
-                          )
-                        : DateTime.now(),
-                  ),
-                  SizedBox(height: 3.h),
                 ],
+              ),
+            ),
+          ],
 
-                SizedBox(height: 3.h),
+          SizedBox(height: 3.h),
 
-                // Submit Button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _canSubmitBooking() ? _submitBooking : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.colorScheme.primary,
-                      foregroundColor: theme.colorScheme.onPrimary,
-                      padding: EdgeInsets.symmetric(vertical: 2.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.0),
+          // Pricing Summary
+          if (selectedServiceType != null &&
+              ((pickupCoordinates != null &&
+                      dropoffCoordinates != null &&
+                      distanceMiles != null &&
+                      durationMinutes != null &&
+                      estimatedPrice != null) ||
+                  (selectedServiceType == 'black_por_hora' &&
+                      estimatedPrice != null) ||
+                  (selectedServiceType == 'black_evento' &&
+                      estimatedPrice != null))) ...[
+            Text(
+              'Resumen del Servicio',
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+            SizedBox(height: 2.h),
+            TransportPricingWidget(
+              distanceMiles: distanceMiles ?? 0.0,
+              durationMinutes:
+                  durationMinutes ?? serviceDurationHours * 60,
+              totalPrice: estimatedPrice!,
+              discountAmount: discountAmount,
+              isAdmin: isAdmin,
+              serviceType: selectedServiceType!,
+              isAirportService: isAirportService,
+              hourlyBreakdown: _hourlyBreakdown,
+              serviceDateTime: serviceDate != null && serviceTime != null
+                  ? DateTime(
+                      serviceDate!.year,
+                      serviceDate!.month,
+                      serviceDate!.day,
+                      serviceTime!.hour,
+                      serviceTime!.minute,
+                    )
+                  : DateTime.now(),
+            ),
+            SizedBox(height: 3.h),
+          ],
+
+          SizedBox(height: 3.h),
+
+          // Submit Button
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _canSubmitBooking() ? _submitBooking : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
+                padding: EdgeInsets.symmetric(vertical: 2.h),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+              ),
+              child: isSubmittingBooking
+                  ? SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          theme.colorScheme.onPrimary,
+                        ),
+                      ),
+                    )
+                  : Text(
+                      'Confirmar Reserva',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: theme.colorScheme.onPrimary,
                       ),
                     ),
-                    child: isSubmittingBooking
-                        ? SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                theme.colorScheme.onPrimary,
-                              ),
-                            ),
-                          )
-                        : Text(
-                            'Confirmar Reserva',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: theme.colorScheme.onPrimary,
-                            ),
-                          ),
-                  ),
-                ),
-              ],
-            ],
+            ),
           ),
-        ),
-      ),
+        ],
+      ],
     );
   }
 
