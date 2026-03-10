@@ -222,7 +222,7 @@ class _ClientDashboardInitialPageState
                 child: Image.asset(
                   'assets/images/maximus_official_logo.png',
                   height: isDesktop ? 34 : 28,
-                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.star, color: Color(0xFFD4AF37)),
+                  errorBuilder: (context, error, stackTrace) => Icon(Icons.star, color: theme.colorScheme.primary),
                 ),
               ),
               const SizedBox(width: 12),
@@ -316,7 +316,7 @@ class _ClientDashboardInitialPageState
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [Color(0xFFD4AF37), Color(0xFFB5942D)],
+                        colors: [theme.colorScheme.primary, Color(0xFFB5942D)],
                       ),
                       borderRadius: BorderRadius.circular(24),
                     ),
@@ -775,7 +775,7 @@ class _ClientDashboardInitialPageState
                child: Container(
                  padding: const EdgeInsets.all(8),
                  decoration: BoxDecoration(color: const Color(0xFF1E1E1E), shape: BoxShape.circle, border: Border.all(color: Colors.white10)),
-                 child: const Icon(Icons.arrow_back, size: 20, color: Color(0xFFD4AF37)),
+                 child: Icon(Icons.arrow_back, size: 20, color: theme.colorScheme.primary),
                ),
              ),
           ],
@@ -976,7 +976,7 @@ class _ClientDashboardInitialPageState
                          errorBuilder: (context, error, stackTrace) => Container(
                            height: 140,
                            color: Colors.white10,
-                           child: const Icon(Icons.directions_car, color: Color(0xFFD4AF37), size: 48),
+                           child: Icon(Icons.directions_car, color: theme.colorScheme.primary, size: 48),
                          ),
                       ),
                     ),
@@ -991,7 +991,7 @@ class _ClientDashboardInitialPageState
                               Text(car['name'] as String, style: GoogleFonts.lexend(fontWeight: FontWeight.w700, fontSize: 17, color: Colors.white)),
                               Row(
                                 children: [
-                                  const Icon(Icons.person, size: 14, color: Color(0xFFD4AF37)),
+                                  Icon(Icons.person, size: 14, color: theme.colorScheme.primary),
                                   const SizedBox(width: 4),
                                   Text('${car['passengers']}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14)),
                                 ],
@@ -1040,6 +1040,7 @@ class _ClientDashboardInitialPageState
   }
 
   Widget _buildSuggestionCard(String title, IconData icon, int tabIndex) {
+    final theme = Theme.of(context);
     return LayoutBuilder(
       builder: (context, constraints) {
         final cardWidth = (constraints.maxWidth - 12) / 2.0;
@@ -1172,7 +1173,7 @@ class _ClientDashboardInitialPageState
             child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                  Icon(Icons.person, size: 14, color: Color(0xFFD4AF37)),
+                  Icon(Icons.person, size: 14, color: theme.colorScheme.primary),
                   SizedBox(width: 8),
                   Text("Para mí", style: TextStyle(fontWeight: FontWeight.w700, color: Colors.white, fontSize: 12)),
                   SizedBox(width: 8),
