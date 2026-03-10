@@ -52,10 +52,10 @@ class AdditionalServicesWidget extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(12.0),
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16.0),
         border: Border.all(
-          color: theme.colorScheme.outline.withValues(alpha: 0.2),
+          color: theme.colorScheme.outline.withValues(alpha: 0.1),
         ),
       ),
       child: Column(
@@ -92,13 +92,13 @@ class AdditionalServicesWidget extends StatelessWidget {
           padding: EdgeInsets.all(3.w),
           decoration: BoxDecoration(
             color: isSelected
-                ? theme.colorScheme.primaryContainer.withValues(alpha: 0.1)
-                : theme.colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(8.0),
+                ? theme.colorScheme.primary.withValues(alpha: 0.1)
+                : theme.cardColor,
+            borderRadius: BorderRadius.circular(12.0),
             border: Border.all(
               color: isSelected
                   ? theme.colorScheme.primary
-                  : theme.colorScheme.outline.withValues(alpha: 0.2),
+                  : theme.colorScheme.outline.withValues(alpha: 0.1),
               width: isSelected ? 2 : 1,
             ),
           ),

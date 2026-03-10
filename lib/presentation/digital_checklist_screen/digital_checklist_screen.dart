@@ -144,7 +144,7 @@ class _DigitalChecklistScreenState extends State<DigitalChecklistScreen> {
 
   @override
   Widget build(BuildContext context) {
-
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: CustomAppBar(
         title: 'Checklist Digital - ${widget.isReturn ? 'Devolución' : 'Entrega'}',
@@ -165,7 +165,7 @@ class _DigitalChecklistScreenState extends State<DigitalChecklistScreen> {
             Slider(
               value: _gasLevel,
               onChanged: (val) => setState(() => _gasLevel = val),
-              activeColor: const Color(0xFF8B1538),
+              activeColor: theme.colorScheme.primary,
             ),
             
             SizedBox(height: 2.h),
@@ -205,8 +205,8 @@ class _DigitalChecklistScreenState extends State<DigitalChecklistScreen> {
               child: ElevatedButton(
                 onPressed: _isSaving ? null : _submitChecklist,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF8B1538),
-                  foregroundColor: Colors.white,
+                  backgroundColor: theme.colorScheme.primary,
+                  foregroundColor: theme.colorScheme.onPrimary,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 child: _isSaving
@@ -241,6 +241,7 @@ class _DigitalChecklistScreenState extends State<DigitalChecklistScreen> {
   }
 
   Widget _buildPhotoCard(String label) {
+    final theme = Theme.of(context);
     final photo = _photos[label];
     return GestureDetector(
       onTap: () => _takePhoto(label),
@@ -257,7 +258,7 @@ class _DigitalChecklistScreenState extends State<DigitalChecklistScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (photo == null) ...[
-              const Icon(Icons.camera_alt, size: 30, color: Color(0xFF8B1538)),
+              Icon(Icons.camera_alt, size: 30, color: theme.colorScheme.primary),
               SizedBox(height: 1.h),
               Text(label, textAlign: TextAlign.center, style: TextStyle(fontSize: 9.sp)),
             ] else ...[

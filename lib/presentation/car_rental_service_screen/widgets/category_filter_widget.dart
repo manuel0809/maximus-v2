@@ -56,6 +56,7 @@ class CategoryFilterWidget extends StatelessWidget {
     required dynamic basePrice,
     required bool isSelected,
   }) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: () => onCategorySelected(categoryId),
       child: Container(
@@ -63,13 +64,13 @@ class CategoryFilterWidget extends StatelessWidget {
         padding: EdgeInsets.all(3.w),
         decoration: BoxDecoration(
           border: Border.all(
-            color: isSelected ? const Color(0xFF8B1538) : Colors.grey.shade300,
+            color: isSelected ? theme.colorScheme.primary : theme.colorScheme.outline.withValues(alpha: 0.3),
             width: 2.0,
           ),
-          borderRadius: BorderRadius.circular(12.0),
+          borderRadius: BorderRadius.circular(16.0),
           color: isSelected
-              ? const Color(0xFF8B1538).withAlpha(26)
-              : Colors.white,
+              ? theme.colorScheme.primary.withValues(alpha: 0.1)
+              : theme.cardColor,
         ),
         child: Column(
           children: [
@@ -80,7 +81,7 @@ class CategoryFilterWidget extends StatelessWidget {
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 12.sp,
-                color: isSelected ? const Color(0xFF8B1538) : Colors.black,
+                color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface,
               ),
               textAlign: TextAlign.center,
             ),
@@ -88,7 +89,7 @@ class CategoryFilterWidget extends StatelessWidget {
               SizedBox(height: 0.5.h),
               Text(
                 'Desde \$$basePrice/día',
-                style: TextStyle(fontSize: 10.sp, color: Colors.grey.shade600),
+                style: TextStyle(fontSize: 10.sp, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                 textAlign: TextAlign.center,
               ),
             ],

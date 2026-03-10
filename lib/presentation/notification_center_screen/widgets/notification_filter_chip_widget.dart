@@ -15,20 +15,26 @@ class NotificationFilterChipWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final primaryColor = theme.colorScheme.primary;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.h),
+        padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 0.8.h),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF8B1538) : Colors.grey[200],
-          borderRadius: BorderRadius.circular(20.0),
+          color: isSelected ? primaryColor : theme.cardColor,
+          borderRadius: BorderRadius.circular(25.0),
+          border: Border.all(
+            color: isSelected ? primaryColor : theme.colorScheme.outline.withValues(alpha: 0.2),
+          ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 11.sp,
-            fontWeight: FontWeight.w500,
-            color: isSelected ? Colors.white : Colors.grey[700],
+            fontSize: 10.sp,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+            color: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
           ),
         ),
       ),

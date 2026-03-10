@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../core/constants/app_constants.dart';
@@ -26,6 +27,7 @@ class _ActiveRentalDashboardState extends State<ActiveRentalDashboard> {
   }
 
   Future<void> _showExtensionModal() async {
+    final theme = Theme.of(context);
     int extraDays = 1;
     showModalBottomSheet(
       context: context,
@@ -40,7 +42,7 @@ class _ActiveRentalDashboardState extends State<ActiveRentalDashboard> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Extender Renta', style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold)),
+              Text('Extender Renta', style: GoogleFonts.lexend(fontSize: 16.sp, fontWeight: FontWeight.w700, color: theme.colorScheme.primary)),
               SizedBox(height: 3.h),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -68,8 +70,8 @@ class _ActiveRentalDashboardState extends State<ActiveRentalDashboard> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF8B1538),
-                    foregroundColor: Colors.white,
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: theme.colorScheme.onPrimary,
                   ),
                   child: const Text('Solicitar Extensión'),
                 ),
@@ -187,7 +189,7 @@ class _ActiveRentalDashboardState extends State<ActiveRentalDashboard> {
               child: _buildActionButton(
                 Icons.add_circle_outline,
                 'EXTENDER RENTA',
-                const Color(0xFF8B1538),
+                theme.colorScheme.primary,
                 _showExtensionModal,
               ),
             ),

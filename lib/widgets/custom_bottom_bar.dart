@@ -26,26 +26,29 @@ class CustomBottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    final theme = Theme.of(context);
+    final primaryColor = theme.colorScheme.primary;
+
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A).withValues(alpha: 0.8),
+        color: const Color(0xFF0F0F0F).withValues(alpha: 0.95),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.4),
-            blurRadius: 15.0,
+            color: Colors.black.withValues(alpha: 0.6),
+            blurRadius: 20.0,
             offset: const Offset(0, -4),
           ),
         ],
         border: Border(
           top: BorderSide(
-            color: Colors.white.withValues(alpha: 0.1),
+            color: Colors.white.withValues(alpha: 0.05),
             width: 0.5,
           ),
         ),
       ),
       child: ClipRRect(
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
           child: SafeArea(
             child: BottomNavigationBar(
               currentIndex: currentIndex,
@@ -53,12 +56,12 @@ class CustomBottomBar extends StatelessWidget {
               type: BottomNavigationBarType.fixed,
               backgroundColor: Colors.transparent,
               elevation: 0,
-              selectedItemColor: const Color(0xFFE8B4B8),
-              unselectedItemColor: Colors.white.withValues(alpha: 0.4),
+              selectedItemColor: primaryColor,
+              unselectedItemColor: Colors.white.withValues(alpha: 0.3),
               selectedFontSize: 11,
               unselectedFontSize: 11,
               selectedLabelStyle: const TextStyle(
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w800,
                 letterSpacing: 0.5,
               ),
               unselectedLabelStyle: const TextStyle(
@@ -67,80 +70,52 @@ class CustomBottomBar extends StatelessWidget {
               ),
               items: [
                 BottomNavigationBarItem(
-                  icon: Icon(
-                    currentIndex == 0 ? Icons.dashboard : Icons.dashboard_outlined,
-                    size: 22,
-                  ),
+                  icon: const Icon(Icons.dashboard_outlined, size: 24),
                   activeIcon: Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF8B1538).withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(10),
+                      color: primaryColor.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(14),
                     ),
-                    child: const Icon(
-                      Icons.dashboard,
-                      size: 22,
-                      color: Color(0xFFE8B4B8),
-                    ),
+                    child: Icon(Icons.dashboard_rounded, size: 24, color: primaryColor),
                   ),
-                  label: 'Dashboard',
+                  label: 'Inicio',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(
-                    currentIndex == 1
-                        ? Icons.event_note
-                        : Icons.event_note_outlined,
-                    size: 22,
-                  ),
+                  icon: const Icon(Icons.calendar_today_outlined, size: 24),
                   activeIcon: Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF8B1538).withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(10),
+                      color: primaryColor.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(14),
                     ),
-                    child: const Icon(
-                      Icons.event_note,
-                      size: 22,
-                      color: Color(0xFFE8B4B8),
-                    ),
+                    child: Icon(Icons.calendar_today_rounded, size: 24, color: primaryColor),
                   ),
-                  label: 'Bookings',
+                  label: 'Reservas',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(
-                    currentIndex == 2 ? Icons.person : Icons.person_outline,
-                    size: 22,
-                  ),
+                  icon: const Icon(Icons.person_outline_rounded, size: 24),
                   activeIcon: Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF8B1538).withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(10),
+                      color: primaryColor.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(14),
                     ),
-                    child: const Icon(Icons.person, size: 22, color: Color(0xFFE8B4B8)),
+                    child: Icon(Icons.person_rounded, size: 24, color: primaryColor),
                   ),
-                  label: 'Profile',
+                  label: 'Perfil',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(
-                    currentIndex == 3
-                        ? Icons.support_agent
-                        : Icons.support_agent_outlined,
-                    size: 22,
-                  ),
+                  icon: const Icon(Icons.headset_mic_outlined, size: 24),
                   activeIcon: Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF8B1538).withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(10),
+                      color: primaryColor.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(14),
                     ),
-                    child: const Icon(
-                      Icons.support_agent,
-                      size: 22,
-                      color: Color(0xFFE8B4B8),
-                    ),
+                    child: Icon(Icons.headset_mic_rounded, size: 24, color: primaryColor),
                   ),
-                  label: 'Support',
+                  label: 'Soporte',
                 ),
               ],
             ),

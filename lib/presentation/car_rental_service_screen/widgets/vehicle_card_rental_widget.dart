@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class VehicleCardRentalWidget extends StatelessWidget {
   final Map<String, dynamic> vehicle;
@@ -51,16 +52,19 @@ class VehicleCardRentalWidget extends StatelessWidget {
     final features = vehicle['features'] as List?;
     final pricePerDay = vehicle['price_per_day'];
 
+    final theme = Theme.of(context);
+    final primaryColor = theme.colorScheme.primary;
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.0),
-        border: isSelected ? Border.all(color: const Color(0xFF8B1538), width: 2) : null,
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16.0),
+        border: isSelected ? Border.all(color: primaryColor, width: 2) : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(26),
-            blurRadius: 8.0,
-            offset: const Offset(0, 4),
+            color: Colors.black.withAlpha(50),
+            blurRadius: 10.0,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
@@ -108,7 +112,7 @@ class VehicleCardRentalWidget extends StatelessWidget {
                     onPressed: onSelected,
                     icon: Icon(
                       isSelected ? Icons.check_circle : Icons.add_circle_outline,
-                      color: isSelected ? const Color(0xFF8B1538) : Colors.white,
+                      color: isSelected ? primaryColor : Colors.white,
                       size: 28,
                     ),
                   ),
@@ -152,9 +156,10 @@ class VehicleCardRentalWidget extends StatelessWidget {
                         children: [
                           Text(
                             '${vehicle['brand']} ${vehicle['model']}',
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
+                            style: GoogleFonts.lexend(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w700,
+                              color: theme.colorScheme.onSurface,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -164,7 +169,7 @@ class VehicleCardRentalWidget extends StatelessWidget {
                             '${vehicle['year']} • ${vehicle['seats']} asientos • ${vehicle['transmission']}',
                             style: TextStyle(
                               fontSize: 10.sp,
-                              color: Colors.grey.shade600,
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                             ),
                           ),
                         ],
@@ -178,7 +183,7 @@ class VehicleCardRentalWidget extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 16.sp,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFF8B1538),
+                            color: primaryColor,
                           ),
                         ),
                         Text(
@@ -238,16 +243,16 @@ class VehicleCardRentalWidget extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: onReservePressed,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8B1538),
+                      backgroundColor: primaryColor,
+                      foregroundColor: theme.colorScheme.onPrimary,
                       padding: EdgeInsets.symmetric(vertical: 1.5.h),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                        borderRadius: BorderRadius.circular(12.0),
                       ),
                     ),
                     child: Text(
                       'Reservar ahora',
                       style: TextStyle(
-                        color: Colors.white,
                         fontSize: 12.sp,
                         fontWeight: FontWeight.bold,
                       ),

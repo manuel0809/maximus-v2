@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sizer/sizer.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../services/storage_service.dart';
 import '../../services/user_service.dart';
 import '../../widgets/custom_app_bar.dart';
@@ -103,6 +104,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final primaryColor = theme.colorScheme.primary;
 
     return Scaffold(
       appBar: const CustomAppBar(title: 'Verificación de Identidad'),
@@ -113,7 +115,11 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
           children: [
             Text(
               'Completa tu perfil',
-              style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+              style: GoogleFonts.lexend(
+                fontSize: 22.sp,
+                fontWeight: FontWeight.w700,
+                color: primaryColor,
+              ),
             ),
             SizedBox(height: 1.h),
             Text(
@@ -143,8 +149,8 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
               child: ElevatedButton(
                 onPressed: _isUploading ? null : _submitVerification,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF8B1538),
-                  foregroundColor: Colors.white,
+                  backgroundColor: primaryColor,
+                  foregroundColor: theme.colorScheme.onPrimary,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 child: _isUploading
@@ -187,7 +193,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         child: Column(
           children: [
             if (image == null) ...[
-              Icon(icon, size: 40, color: const Color(0xFF8B1538)),
+              Icon(icon, size: 40, color: theme.colorScheme.primary),
               SizedBox(height: 2.h),
               Text(title, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
               Text(subtitle, style: theme.textTheme.bodySmall),

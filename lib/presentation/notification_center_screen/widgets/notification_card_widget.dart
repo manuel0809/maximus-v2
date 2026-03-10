@@ -16,7 +16,7 @@ class NotificationCardWidget extends StatelessWidget {
     required this.onMarkAsRead,
   });
 
-  Color _getTypeColor(String type) {
+  Color _getTypeColor(String type, Color primaryColor) {
     switch (type) {
       case 'booking_status':
         return Colors.blue;
@@ -25,7 +25,7 @@ class NotificationCardWidget extends StatelessWidget {
       case 'trip_completed':
         return Colors.amber;
       case 'promotion':
-        return const Color(0xFF8B1538);
+        return primaryColor;
       default:
         return Colors.grey;
     }
@@ -90,7 +90,7 @@ class NotificationCardWidget extends StatelessWidget {
     final type = notification['type'] ?? 'booking_status';
     final priority = notification['priority'] ?? 'medium';
     final isRead = notification['is_read'] ?? false;
-    final typeColor = _getTypeColor(type);
+    final typeColor = _getTypeColor(type, colorScheme.primary);
 
     return Dismissible(
       key: Key(notification['id']),

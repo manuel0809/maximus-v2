@@ -48,6 +48,7 @@ class _DateLocationSearchWidgetState extends State<DateLocationSearchWidget> {
         ? (widget.pickupDate ?? DateTime.now())
         : (widget.dropoffDate ?? widget.pickupDate ?? DateTime.now());
 
+    final theme = Theme.of(context);
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: initialDate,
@@ -55,12 +56,11 @@ class _DateLocationSearchWidgetState extends State<DateLocationSearchWidget> {
       lastDate: DateTime.now().add(const Duration(days: 365)),
       builder: (context, child) {
         return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFF8B1538),
-              onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: Colors.black,
+          data: theme.copyWith(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: theme.colorScheme.primary,
+              brightness: theme.brightness,
+              primary: theme.colorScheme.primary,
             ),
           ),
           child: child!,
@@ -79,15 +79,16 @@ class _DateLocationSearchWidgetState extends State<DateLocationSearchWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 4.w),
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.0),
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16.0),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(26),
+            color: Colors.black.withAlpha(50),
             blurRadius: 10.0,
             offset: const Offset(0, 5),
           ),
@@ -159,10 +160,11 @@ class _DateLocationSearchWidgetState extends State<DateLocationSearchWidget> {
             child: ElevatedButton(
               onPressed: widget.onSearchPressed,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF8B1538),
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
                 padding: EdgeInsets.symmetric(vertical: 1.5.h),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
+                  borderRadius: BorderRadius.circular(12.0),
                 ),
               ),
               child: Row(
@@ -196,6 +198,7 @@ class _DateLocationSearchWidgetState extends State<DateLocationSearchWidget> {
     required Function(double, double, String) onLocationSelected,
     String? placeholder,
   }) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -204,47 +207,46 @@ class _DateLocationSearchWidgetState extends State<DateLocationSearchWidget> {
           style: TextStyle(
             fontSize: 12.sp,
             fontWeight: FontWeight.w600,
-            color: Colors.grey.shade700,
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
         SizedBox(height: 1.h),
         InkWell(
           onTap: onToggleMap,
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.5.h),
+            padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
             decoration: BoxDecoration(
+              color: theme.cardColor,
+              borderRadius: BorderRadius.circular(12.0),
               border: Border.all(
-                color: showMap ? const Color(0xFF8B1538) : Colors.grey.shade300,
-                width: showMap ? 2.0 : 1.0,
+                color: theme.colorScheme.outline.withValues(alpha: 0.1),
               ),
-              borderRadius: BorderRadius.circular(8.0),
             ),
             child: Row(
               children: [
                 Icon(
                   Icons.location_on,
-                  color: lat != null && lng != null
-                      ? const Color(0xFF8B1538)
-                      : Colors.grey.shade600,
+                  color: theme.colorScheme.primary,
+                  size: 20,
                 ),
-                SizedBox(width: 2.w),
+                SizedBox(width: 3.w),
                 Expanded(
                   child: Text(
                     lat != null && lng != null
-                        ? '📌 Lat: ${lat.toStringAsFixed(4)}, Lng: ${lng.toStringAsFixed(4)}'
+                        ? 'Lat: ${lat.toStringAsFixed(4)}, Lng: ${lng.toStringAsFixed(4)}'
                         : placeholder ?? 'Seleccionar en el mapa',
                     style: TextStyle(
                       fontSize: 12.sp,
                       color: lat != null && lng != null
-                          ? Colors.black
-                          : Colors.grey.shade600,
+                          ? theme.colorScheme.onSurface
+                          : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 Icon(
                   showMap ? Icons.expand_less : Icons.expand_more,
-                  color: Colors.grey.shade600,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ],
             ),
@@ -255,11 +257,11 @@ class _DateLocationSearchWidgetState extends State<DateLocationSearchWidget> {
           Container(
             height: 35.h,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-              border: Border.all(color: const Color(0xFF8B1538), width: 2.0),
+              borderRadius: BorderRadius.circular(12.0),
+              border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.3)),
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
+              borderRadius: BorderRadius.circular(12.0),
               child: MapboxLocationPickerWidget(
                 initialLatitude: lat,
                 initialLongitude: lng,
@@ -278,6 +280,7 @@ class _DateLocationSearchWidgetState extends State<DateLocationSearchWidget> {
     required DateTime? date,
     required VoidCallback onTap,
   }) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -300,9 +303,9 @@ class _DateLocationSearchWidgetState extends State<DateLocationSearchWidget> {
             ),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.calendar_today,
-                  color: Color(0xFF8B1538),
+                  color: theme.colorScheme.primary,
                   size: 18,
                 ),
                 SizedBox(width: 2.w),
@@ -313,7 +316,7 @@ class _DateLocationSearchWidgetState extends State<DateLocationSearchWidget> {
                         : 'Seleccionar',
                     style: TextStyle(
                       fontSize: 12.sp,
-                      color: date != null ? Colors.black : Colors.grey.shade600,
+                      color: date != null ? theme.colorScheme.onSurface : Colors.grey.shade600,
                     ),
                   ),
                 ),

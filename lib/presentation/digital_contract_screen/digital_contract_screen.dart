@@ -1,6 +1,7 @@
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../services/document_service.dart';
 import '../../services/storage_service.dart';
 import '../../widgets/custom_app_bar.dart';
@@ -77,6 +78,7 @@ class _DigitalContractScreenState extends State<DigitalContractScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final primaryColor = theme.colorScheme.primary;
 
     return Scaffold(
       appBar: CustomAppBar(title: 'Contrato Digital'),
@@ -87,9 +89,25 @@ class _DigitalContractScreenState extends State<DigitalContractScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                   Text(
+                    'Revisión de Contrato',
+                    style: GoogleFonts.lexend(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w700,
+                      color: primaryColor,
+                    ),
+                  ),
+                  SizedBox(height: 2.h),
                   _buildContractContent(theme),
                   SizedBox(height: 4.h),
-                  const Text('Firma del Cliente', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text(
+                    'Firma del Cliente',
+                    style: GoogleFonts.lexend(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
                   SizedBox(height: 1.h),
                   SignaturePad(key: _signatureKey),
                   SizedBox(height: 4.h),
@@ -104,9 +122,9 @@ class _DigitalContractScreenState extends State<DigitalContractScreen> {
     return Container(
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[300]!),
+        border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,14 +135,13 @@ class _DigitalContractScreenState extends State<DigitalContractScreen> {
           ),
           SizedBox(height: 2.h),
           Text(
-            'Por medio del presente contrato, MAXIMUS TRANSPORT (El Arrendador) otorga en uso el vehículo descrito en la reserva a ${contract?['rentals']?['profiles']?['full_name'] ?? 'El Cliente'} (El Arrendatario) bajo los siguientes términos...',
+            'Por medio del presente contrato, MAXIMUS LEVEL GROUP (El Arrendador) otorga en uso el vehículo descrito en la reserva a ${contract?['rentals']?['profiles']?['full_name'] ?? 'El Cliente'} (El Arrendatario) bajo los siguientes términos...',
             textAlign: TextAlign.justify,
           ),
           SizedBox(height: 1.h),
           const Text('1. USO DEL VEHÍCULO: El vehículo se entrega en óptimas condiciones...', textAlign: TextAlign.justify),
           const Text('2. SEGURO: El vehículo cuenta con póliza de seguro de cobertura amplia...', textAlign: TextAlign.justify),
           const Text('3. DEVOLUCIÓN: El cliente se compromete a devolver el auto en la fecha pactada...', textAlign: TextAlign.justify),
-          // More mock text...
         ],
       ),
     );
@@ -136,6 +153,10 @@ class _DigitalContractScreenState extends State<DigitalContractScreen> {
         Expanded(
           child: OutlinedButton(
             onPressed: () => Navigator.pop(context),
+            style: OutlinedButton.styleFrom(
+              padding: EdgeInsets.symmetric(vertical: 2.h),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
             child: const Text('Cancelar'),
           ),
         ),
@@ -144,10 +165,12 @@ class _DigitalContractScreenState extends State<DigitalContractScreen> {
           child: ElevatedButton(
             onPressed: isSaving ? null : _handleSign,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF8B1538),
-              foregroundColor: Colors.white,
+              backgroundColor: theme.colorScheme.primary,
+              foregroundColor: theme.colorScheme.onPrimary,
+              padding: EdgeInsets.symmetric(vertical: 2.h),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            child: isSaving ? const CircularProgressIndicator(color: Colors.white) : const Text('Firmar Contrato'),
+            child: isSaving ? const CircularProgressIndicator(color: Colors.white) : const Text('Firmar Contrato', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ),
       ],

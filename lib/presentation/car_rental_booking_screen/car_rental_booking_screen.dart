@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../widgets/custom_app_bar.dart';
 import './widgets/additional_services_widget.dart';
@@ -164,12 +165,12 @@ class _CarRentalBookingScreenState extends State<CarRentalBookingScreen> {
                 ),
                 SizedBox(height: 2.h),
 
-                // Interactive Map for Pickup Location
                 Text(
-                  'Seleccionar Ubicación de Recogida en Mapa',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface,
+                  'Seleccionar Ubicación en Mapa',
+                  style: GoogleFonts.lexend(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.primary,
                   ),
                 ),
                 SizedBox(height: 1.h),
@@ -234,12 +235,13 @@ class _CarRentalBookingScreenState extends State<CarRentalBookingScreen> {
                         ? _submitBooking
                         : null,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8B1538),
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(vertical: 1.8.h),
+                      backgroundColor: theme.colorScheme.primary,
+                      foregroundColor: theme.colorScheme.onPrimary,
+                      padding: EdgeInsets.symmetric(vertical: 2.h),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                        borderRadius: BorderRadius.circular(12.0),
                       ),
+                      elevation: 4,
                     ),
                     child: isSubmittingBooking
                         ? SizedBox(
@@ -254,9 +256,10 @@ class _CarRentalBookingScreenState extends State<CarRentalBookingScreen> {
                           )
                         : Text(
                             'Confirmar Reserva',
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w600,
+                            style: GoogleFonts.lexend(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
                             ),
                           ),
                   ),
@@ -271,12 +274,14 @@ class _CarRentalBookingScreenState extends State<CarRentalBookingScreen> {
 
   Widget _buildSectionHeader(String title, ThemeData theme) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
+      padding: EdgeInsets.symmetric(vertical: 1.h),
       child: Text(
         title,
-        style: theme.textTheme.titleLarge?.copyWith(
-          fontWeight: FontWeight.w600,
-          color: theme.colorScheme.onSurface,
+        style: GoogleFonts.lexend(
+          fontSize: 18,
+          fontWeight: FontWeight.w700,
+          color: theme.colorScheme.primary,
+          letterSpacing: -0.5,
         ),
       ),
     );

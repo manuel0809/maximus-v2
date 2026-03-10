@@ -109,8 +109,8 @@ class _MyDocumentsScreenState extends State<MyDocumentsScreen> {
             color: theme.colorScheme.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: const Icon(Icons.badge_outlined, color: Color(0xFF8B1538)),
-        ),
+            child: Icon(Icons.badge_outlined, color: theme.colorScheme.primary),
+          ),
         title: Text(_mapDocType(doc['document_type'])),
         subtitle: Row(
           children: [

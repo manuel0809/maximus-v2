@@ -6,6 +6,7 @@ import './services/localization_service.dart';
 import './services/notification_service.dart';
 import './services/realtime_service.dart';
 import './core/app_config.dart';
+import './theme/app_theme.dart';
 
 class MaximusApp extends StatelessWidget {
   const MaximusApp({super.key});
@@ -23,16 +24,8 @@ class MaximusApp extends StatelessWidget {
           child: MaterialApp(
             title: AppConfig.appTitle,
             debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-              brightness: Brightness.dark,
-              primaryColor: const Color(0xFFD4AF37),
-              colorScheme: ColorScheme.fromSeed(
-                seedColor: const Color(0xFFD4AF37),
-                brightness: Brightness.dark,
-                primary: const Color(0xFFD4AF37),
-                onPrimary: Colors.black,
-              ),
-            ),
+            // Select professional burgundy for staff, luxury gold for clients
+            theme: AppConfig.isStaff ? AppTheme.staffTheme : AppTheme.darkTheme,
             initialRoute: AppRoutes.initial,
             routes: AppRoutes.routes,
           ),

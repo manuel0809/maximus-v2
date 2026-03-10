@@ -127,19 +127,26 @@ class _ClientDashboardInitialPageState
     final isDesktop = MediaQuery.of(context).size.width > 800;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFF0F0F0F),
       body: Stack(
         children: [
           // 1. Background Map
           _buildMap(),
+          
+          // Subtle dark overlay to map
+          IgnorePointer(
+            child: Container(
+              color: const Color(0xFF0F0F0F).withValues(alpha: 0.1),
+            ),
+          ),
 
           // 2. Interactive Panel
           if (isDesktop)
             Positioned(
-              top: MediaQuery.of(context).padding.top + 80,
+              top: MediaQuery.of(context).padding.top + 85,
               left: 40,
               bottom: 40,
-              width: 420,
+              width: 440,
               child: _buildDesktopPanel(),
             )
           else
@@ -177,32 +184,62 @@ class _ClientDashboardInitialPageState
   }
 
   Widget _buildHeader(bool isDesktop) {
+    final theme = Theme.of(context);
     final user = Supabase.instance.client.auth.currentUser;
     final isLoggedIn = user != null;
 
     return Container(
-      color: Colors.white,
-      padding: EdgeInsets.fromLTRB(isDesktop ? 40 : 20, MediaQuery.of(context).padding.top + 16, isDesktop ? 40 : 20, 16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F0F0F).withValues(alpha: 0.95),
+        border: const Border(
+          bottom: BorderSide(color: Colors.white12, width: 0.5),
+        ),
+      ),
+      padding: EdgeInsets.fromLTRB(isDesktop ? 40 : 20, MediaQuery.of(context).padding.top + 12, isDesktop ? 40 : 20, 12),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Logo & Tabs (Desktop)
           Row(
             children: [
-              Text(
-                "MAXIMUS LEVEL GROUP",
-                style: GoogleFonts.lexend(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w900,
-                  fontSize: isDesktop ? 18 : 14,
-                  letterSpacing: -0.5,
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: theme.colorScheme.primary, width: 1.5),
+                ),
+                child: Image.asset(
+                  'assets/images/maximus_official_logo.png',
+                  height: isDesktop ? 34 : 28,
+                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.star, color: Color(0xFFD4AF37)),
                 ),
               ),
               const SizedBox(width: 12),
-              Image.asset(
-                'assets/images/maximus_official_logo.png',
-                height: isDesktop ? 32 : 24,
-                errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "MAXIMUS",
+                    style: GoogleFonts.lexend(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.w900,
+                      fontSize: isDesktop ? 18 : 14,
+                      letterSpacing: 1.5,
+                      height: 1.0,
+                    ),
+                  ),
+                  Text(
+                    "LEVEL GROUP",
+                    style: GoogleFonts.lexend(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w400,
+                      fontSize: isDesktop ? 10 : 8,
+                      letterSpacing: 2.5,
+                      height: 1.0,
+                    ),
+                  ),
+                ],
               ),
               if (isDesktop) ...[
                 const SizedBox(width: 40),
@@ -229,16 +266,28 @@ class _ClientDashboardInitialPageState
                      child: Container(
                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                        decoration: BoxDecoration(
-                         color: _isProfileMenuOpen ? const Color(0xFFE5E5E5) : const Color(0xFFF3F3F3), 
+                         color: _isProfileMenuOpen ? theme.colorScheme.primary : const Color(0xFF1E1E1E), 
                          borderRadius: BorderRadius.circular(20),
+                         border: Border.all(color: Colors.white10),
                        ),
                        child: Row(
                          children: [
-                           const Icon(Icons.person, color: Colors.black, size: 18),
+                           Icon(Icons.person, color: _isProfileMenuOpen ? Colors.black : theme.colorScheme.primary, size: 18),
                            const SizedBox(width: 8),
-                           Text(userName.isNotEmpty ? userName : "Perfil", style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 13)),
+                           Text(
+                             userName.isNotEmpty ? userName : "Perfil", 
+                             style: TextStyle(
+                               color: _isProfileMenuOpen ? Colors.black : Colors.white, 
+                               fontWeight: FontWeight.w700, 
+                               fontSize: 13,
+                             )
+                           ),
                            const SizedBox(width: 8),
-                           Icon(_isProfileMenuOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: Colors.black, size: 18),
+                           Icon(
+                             _isProfileMenuOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, 
+                             color: _isProfileMenuOpen ? Colors.black : Colors.white60, 
+                             size: 18,
+                           ),
                          ],
                        )
                      ),
@@ -247,15 +296,20 @@ class _ClientDashboardInitialPageState
               ] else ...[
                 TextButton(
                   onPressed: () => Navigator.pushNamed(context, AppRoutes.loginRegistration),
-                  child: const Text("Log in", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 14)),
+                  child: const Text("Log in", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14)),
                 ),
                 const SizedBox(width: 8),
                 GestureDetector(
                   onTap: () => Navigator.pushNamed(context, AppRoutes.loginRegistration),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(24)),
-                    child: const Text("Sign up", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14)),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFD4AF37), Color(0xFFB5942D)],
+                      ),
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: const Text("Sign up", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w800, fontSize: 14)),
                   ),
                 ),
               ]
@@ -504,6 +558,7 @@ class _ClientDashboardInitialPageState
   }
 
   Widget _buildHeaderTab(String title, IconData icon, int index, {bool isDropdown = false}) {
+    final theme = Theme.of(context);
     final isSelected = _selectedTabIndex == index || (isDropdown && _isMoreMenuOpen);
     return GestureDetector(
       onTap: () {
@@ -517,16 +572,24 @@ class _ClientDashboardInitialPageState
         }
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFF3F3F3) : Colors.transparent,
+          color: isSelected ? theme.colorScheme.primary : Colors.transparent,
           borderRadius: BorderRadius.circular(24),
+          border: isSelected ? null : Border.all(color: Colors.white10),
         ),
         child: Row(
           children: [
-            Icon(icon, size: 18, color: Colors.black),
+            Icon(icon, size: 18, color: isSelected ? Colors.black : theme.colorScheme.primary),
             const SizedBox(width: 8),
-            Text(title, style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500)),
+            Text(
+              title, 
+              style: TextStyle(
+                color: isSelected ? Colors.black : Colors.white, 
+                fontSize: 14, 
+                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600
+              )
+            ),
           ],
         ),
       ),
@@ -536,27 +599,38 @@ class _ClientDashboardInitialPageState
   Widget _buildDesktopPanel() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: const Color(0xFF0F0F0F).withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white10),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: Colors.black.withValues(alpha: 0.5),
+            blurRadius: 40,
+            offset: const Offset(0, 15),
           )
         ]
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildPanelContent(),
-          const Divider(height: 1, color: Color(0xFFEEEEEE)),
-          Padding(
-            padding: const EdgeInsets.all(24),
-            child: _buildSuggestionsGrid(),
-          )
-        ],
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Column(
+          children: [
+             Expanded(
+               child: SingleChildScrollView(
+                 padding: const EdgeInsets.all(32),
+                 child: Column(
+                   crossAxisAlignment: CrossAxisAlignment.start,
+                   children: [
+                     _buildPanelContent(),
+                     const SizedBox(height: 32),
+                     const Divider(color: Colors.white10),
+                     const SizedBox(height: 32),
+                     _buildSuggestionsGrid(),
+                   ],
+                 ),
+               ),
+             )
+          ],
+        ),
       )
     );
   }
@@ -567,11 +641,12 @@ class _ClientDashboardInitialPageState
       child: Container(
         constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.85),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+          color: const Color(0xFF0F0F0F),
+          borderRadius: const BorderRadius.only(topLeft: Radius.circular(32), topRight: Radius.circular(32)),
+          border: const Border(top: BorderSide(color: Colors.white10)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
+              color: Colors.black.withValues(alpha: 0.5),
               blurRadius: 20,
               offset: const Offset(0, -5),
             )
@@ -583,7 +658,7 @@ class _ClientDashboardInitialPageState
             mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: 12),
-              Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))),
+              Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white12, borderRadius: BorderRadius.circular(2))),
               const SizedBox(height: 12),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
@@ -664,12 +739,18 @@ class _ClientDashboardInitialPageState
   }
 
   Widget _buildRideContent() {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "Consigue un viaje",
-          style: TextStyle(fontSize: 34, fontWeight: FontWeight.w800, letterSpacing: -1, color: Colors.black),
+          style: GoogleFonts.lexend(
+            fontSize: 26,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.5,
+            color: theme.colorScheme.primary,
+          ),
         ),
         const SizedBox(height: 24),
         _buildLocationInputs(),
@@ -682,26 +763,34 @@ class _ClientDashboardInitialPageState
   }
 
   Widget _buildHourlyContent() {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
              InkWell(
-               onTap: () {},
+               onTap: () {
+                 setState(() => _selectedTabIndex = 0);
+               },
                borderRadius: BorderRadius.circular(20),
                child: Container(
                  padding: const EdgeInsets.all(8),
-                 decoration: BoxDecoration(color: const Color(0xFFF3F3F3), shape: BoxShape.circle),
-                 child: const Icon(Icons.arrow_back, size: 20),
+                 decoration: BoxDecoration(color: const Color(0xFF1E1E1E), shape: BoxShape.circle, border: Border.all(color: Colors.white10)),
+                 child: const Icon(Icons.arrow_back, size: 20, color: Color(0xFFD4AF37)),
                ),
              ),
           ],
         ),
         const SizedBox(height: 16),
-        const Text(
+        Text(
           "¿Cuánto tiempo necesitas?",
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, letterSpacing: -0.5, color: Colors.black),
+          style: GoogleFonts.lexend(
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.2,
+            color: theme.colorScheme.primary,
+          ),
         ),
         const SizedBox(height: 40),
         
@@ -715,10 +804,17 @@ class _ClientDashboardInitialPageState
                    setState(() => _selectedHours--);
                  }
                },
-               child: Container(padding: const EdgeInsets.all(8), decoration: const BoxDecoration(color: Color(0xFFF3F3F3), shape: BoxShape.circle), child: Icon(Icons.remove, size: 24, color: _selectedHours > 2 ? Colors.black : Colors.black38)),
+               child: Container(
+                 padding: const EdgeInsets.all(8), 
+                 decoration: BoxDecoration(color: const Color(0xFF1E1E1E), shape: BoxShape.circle, border: Border.all(color: Colors.white10)), 
+                 child: Icon(Icons.remove, size: 24, color: _selectedHours > 2 ? theme.colorScheme.primary : Colors.white24),
+               ),
             ),
             const SizedBox(width: 32),
-            Text("$_selectedHours horas", style: const TextStyle(fontSize: 36, fontWeight: FontWeight.w800)),
+            Text(
+              "$_selectedHours horas", 
+              style: GoogleFonts.lexend(fontSize: 28, fontWeight: FontWeight.w800, color: Colors.white),
+            ),
             const SizedBox(width: 32),
             InkWell(
                onTap: () {
@@ -726,28 +822,33 @@ class _ClientDashboardInitialPageState
                    setState(() => _selectedHours++);
                  }
                },
-               child: Container(padding: const EdgeInsets.all(8), decoration: const BoxDecoration(color: Color(0xFFF3F3F3), shape: BoxShape.circle), child: Icon(Icons.add, size: 24, color: _selectedHours < 12 ? Colors.black : Colors.black38)),
+               child: Container(
+                 padding: const EdgeInsets.all(8), 
+                 decoration: BoxDecoration(color: const Color(0xFF1E1E1E), shape: BoxShape.circle, border: Border.all(color: Colors.white10)), 
+                 child: Icon(Icons.add, size: 24, color: _selectedHours < 12 ? theme.colorScheme.primary : Colors.white24),
+               ),
             ),
           ],
         ),
         const SizedBox(height: 12),
-        Center(child: Text("Incluido: ${_selectedHours * 20} millas", style: const TextStyle(color: Colors.black54, fontSize: 14))),
+        Center(child: Text("Incluido: ${_selectedHours * 20} millas", style: const TextStyle(color: Colors.white60, fontSize: 14))),
         const SizedBox(height: 40),
         
-        // Fake Slider
+        // Fake Slider (Luxury Styled)
         Row(
-          children: [
-            Container(width: 16, height: 16, decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white, border: Border.all(color: Colors.grey.shade300, width: 2))),
-            Expanded(child: Container(height: 2, color: Colors.black)),
-            const SizedBox(width: 4),
-            Expanded(child: Container(height: 2, color: Colors.black)),
-            const SizedBox(width: 4),
-            Expanded(child: Container(height: 2, color: Colors.black)),
-            const SizedBox(width: 4),
-            Expanded(child: Container(height: 2, color: Colors.black)),
-            const SizedBox(width: 4),
-            Expanded(child: Container(height: 2, color: Colors.black)),
-          ],
+          children: List.generate(10, (index) {
+            final isActive = index < (_selectedHours - 2) * 1; // Simplified mapping
+            return Expanded(
+              child: Container(
+                height: 4,
+                margin: const EdgeInsets.symmetric(horizontal: 2),
+                decoration: BoxDecoration(
+                  color: isActive ? theme.colorScheme.primary : Colors.white12,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            );
+          }),
         ),
         const SizedBox(height: 40),
         
@@ -756,12 +857,18 @@ class _ClientDashboardInitialPageState
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-             const Text("Desde", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+             const Text("Desde", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: Colors.white70)),
              Column(
                crossAxisAlignment: CrossAxisAlignment.end,
                children: [
-                   Text("${(_hourlyRate * _selectedHours).toStringAsFixed(2)} US\$", style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 20)),
-                   Text("${_hourlyRate.toStringAsFixed(2)} US\$/hora", style: const TextStyle(color: Colors.black54, fontSize: 13, decoration: TextDecoration.lineThrough)),
+                   Text(
+                     "${(_hourlyRate * _selectedHours).toStringAsFixed(2)} US\$", 
+                     style: GoogleFonts.lexend(fontWeight: FontWeight.w800, fontSize: 24, color: theme.colorScheme.primary),
+                   ),
+                   Text(
+                     "${_hourlyRate.toStringAsFixed(2)} US\$/hora", 
+                     style: const TextStyle(color: Colors.white38, fontSize: 13, decoration: TextDecoration.lineThrough),
+                   ),
                ],
              )
           ],
@@ -773,12 +880,18 @@ class _ClientDashboardInitialPageState
   }
 
   Widget _buildReserveContent() {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "Planea para más adelante",
-          style: TextStyle(fontSize: 34, fontWeight: FontWeight.w800, letterSpacing: -1, color: Colors.black),
+          style: GoogleFonts.lexend(
+            fontSize: 26,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.5,
+            color: theme.colorScheme.primary,
+          ),
         ),
         const SizedBox(height: 24),
         _buildLocationInputs(),
@@ -789,24 +902,25 @@ class _ClientDashboardInitialPageState
   }
 
   Widget _buildSuggestionsGrid() {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "Sugerencias",
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.black),
+          style: GoogleFonts.lexend(fontSize: 18, fontWeight: FontWeight.w700, color: theme.colorScheme.primary),
         ),
         const SizedBox(height: 16),
         Wrap(
           spacing: 12,
           runSpacing: 12,
           children: [
-            _buildSuggestionCard("Ride", Icons.directions_car, 0),
-            _buildSuggestionCard("Reserve", Icons.calendar_today, 2),
-            _buildSuggestionCard("Rental Cars", Icons.key, 3),
-            _buildSuggestionCard("Hourly", Icons.access_time_filled, 1),
-            _buildSuggestionCard("Food", Icons.restaurant, 5),
-            _buildSuggestionCard("Grocery", Icons.shopping_basket, 6),
+            _buildSuggestionCard("Viaje", Icons.directions_car, 0),
+            _buildSuggestionCard("Reserva", Icons.calendar_today, 2),
+            _buildSuggestionCard("Autos", Icons.key, 3),
+            _buildSuggestionCard("Por Horas", Icons.access_time_filled, 1),
+            _buildSuggestionCard("Comer", Icons.restaurant, 5),
+            _buildSuggestionCard("Super", Icons.shopping_basket, 6),
           ],
         )
       ],
@@ -814,6 +928,7 @@ class _ClientDashboardInitialPageState
   }
 
   Widget _buildRentalContent() {
+    final theme = Theme.of(context);
     final cars = [
       {'name': 'Black', 'desc': 'Viajes en vehículos de gama alta', 'passengers': 4, 'time': '11 min', 'price': '84.97 US\$', 'img': 'assets/images/Untitled-1770903998939.jpeg'},
       {'name': 'Black SUV', 'desc': 'Viajes de lujo para 6 personas con socios de la App profesionales', 'passengers': 6, 'time': '10 min', 'price': '101.98 US\$', 'img': 'assets/images/Untitled-1770905042048.jpeg'},
@@ -822,16 +937,21 @@ class _ClientDashboardInitialPageState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "Vehículos de Alquiler",
-          style: TextStyle(fontSize: 34, fontWeight: FontWeight.w800, letterSpacing: -1, color: Colors.black),
+          style: GoogleFonts.lexend(
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.5,
+            color: theme.colorScheme.primary,
+          ),
         ),
         const SizedBox(height: 8),
         const Text(
           "Selecciona el vehículo perfecto para ti.",
-          style: TextStyle(fontSize: 14, color: Colors.black54),
+          style: TextStyle(fontSize: 14, color: Colors.white54),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 16),
         SizedBox(
           height: 310,
           child: ListView.separated(
@@ -843,15 +963,15 @@ class _ClientDashboardInitialPageState
               return Container(
                 width: 280,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF3F3F3),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFE5E5E5)),
+                  color: const Color(0xFF1E1E1E),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.white10),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     ClipRRect(
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                       child: Image.asset(
                          car['img'] as String,
                          height: 140,
@@ -859,7 +979,7 @@ class _ClientDashboardInitialPageState
                          fit: BoxFit.cover,
                          errorBuilder: (context, error, stackTrace) => Container(
                            height: 140,
-                           color: Colors.black87,
+                           color: Colors.white10,
                            child: const Icon(Icons.directions_car, color: Color(0xFFD4AF37), size: 48),
                          ),
                       ),
@@ -872,18 +992,18 @@ class _ClientDashboardInitialPageState
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(car['name'] as String, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: Colors.black)),
+                              Text(car['name'] as String, style: GoogleFonts.lexend(fontWeight: FontWeight.w700, fontSize: 17, color: Colors.white)),
                               Row(
                                 children: [
-                                  const Icon(Icons.person, size: 14, color: Colors.black),
+                                  const Icon(Icons.person, size: 14, color: Color(0xFFD4AF37)),
                                   const SizedBox(width: 4),
-                                  Text('${car['passengers']}', style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 14)),
+                                  Text('${car['passengers']}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14)),
                                 ],
                               )
                             ],
                           ),
                           const SizedBox(height: 4),
-                          Text(car['desc'] as String, style: const TextStyle(fontSize: 12, color: Colors.black54), maxLines: 2, overflow: TextOverflow.ellipsis),
+                          Text(car['desc'] as String, style: const TextStyle(fontSize: 12, color: Colors.white54), maxLines: 2, overflow: TextOverflow.ellipsis),
                           const SizedBox(height: 16),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -891,8 +1011,8 @@ class _ClientDashboardInitialPageState
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(car['time'] as String, style: const TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.w600)),
-                                  Text(car['price'] as String, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: Colors.black)),
+                                  Text(car['time'] as String, style: const TextStyle(color: Color(0xFFD4AF37), fontSize: 12, fontWeight: FontWeight.w600)),
+                                  Text(car['price'] as String, style: GoogleFonts.lexend(fontWeight: FontWeight.w800, fontSize: 17, color: Colors.white)),
                                 ],
                               ),
                               ElevatedButton(
@@ -903,10 +1023,10 @@ class _ClientDashboardInitialPageState
                                   backgroundColor: const Color(0xFFD4AF37),
                                   foregroundColor: Colors.black,
                                   elevation: 0,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                 ),
-                                child: const Text("Reservar", style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                                child: const Text("Reservar", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
                               )
                             ],
                           )
@@ -935,17 +1055,22 @@ class _ClientDashboardInitialPageState
           },
           child: Container(
             width: cardWidth,
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
             decoration: BoxDecoration(
-              color: const Color(0xFFF3F3F3),
-              borderRadius: BorderRadius.circular(12),
+              color: const Color(0xFF1E1E1E),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.white10),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, size: 36, color: Colors.black87),
+                Icon(icon, size: 36, color: const Color(0xFFD4AF37)),
                 const SizedBox(height: 12),
-                Text(title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: Colors.black)),
+                Text(
+                  title, 
+                  style: GoogleFonts.lexend(fontWeight: FontWeight.w700, fontSize: 14, color: Colors.white),
+                  textAlign: TextAlign.center,
+                ),
               ],
             ),
           ),
@@ -955,6 +1080,7 @@ class _ClientDashboardInitialPageState
   }
 
   Widget _buildLocationInputs() {
+    final theme = Theme.of(context);
     return Column(
       children: [
         // Time Selector
@@ -963,17 +1089,18 @@ class _ClientDashboardInitialPageState
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
-              color: const Color(0xFFEEEEEE),
+              color: const Color(0xFF1E1E1E),
               borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: Colors.white10),
             ),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.access_time_filled, size: 16, color: Colors.black),
-                SizedBox(width: 8),
-                Text("Ahora", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 13)),
-                SizedBox(width: 4),
-                Icon(Icons.keyboard_arrow_down, size: 16, color: Colors.black),
+                Icon(Icons.access_time_filled, size: 16, color: theme.colorScheme.primary),
+                const SizedBox(width: 8),
+                const Text("Ahora", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13)),
+                const SizedBox(width: 4),
+                const Icon(Icons.keyboard_arrow_down, size: 16, color: Colors.white70),
               ],
             ),
           ),
@@ -981,56 +1108,60 @@ class _ClientDashboardInitialPageState
         const SizedBox(height: 20),
         // Inputs
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          decoration: BoxDecoration(color: const Color(0xFFF3F3F3), borderRadius: BorderRadius.circular(12)),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1E1E1E), 
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white10),
+          ),
           child: Row(
             children: [
-               const Icon(Icons.circle, size: 10, color: Colors.black),
+               Icon(Icons.circle, size: 10, color: theme.colorScheme.primary),
                const SizedBox(width: 16),
-               const Expanded(child: Text("Ubicación de recogida", style: TextStyle(color: Colors.black38, fontSize: 16, fontWeight: FontWeight.w500))),
+               Expanded(
+                 child: Text(
+                   currentLocation.isNotEmpty ? currentLocation : "Ubicación de recogida", 
+                   style: TextStyle(color: currentLocation.isNotEmpty ? Colors.white : Colors.white38, fontSize: 16, fontWeight: FontWeight.w500)
+                 )
+               ),
             ],
           )
         ),
         const SizedBox(height: 12),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          decoration: BoxDecoration(color: const Color(0xFFF3F3F3), borderRadius: BorderRadius.circular(12)),
-          child: const Row(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1E1E1E), 
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white10),
+          ),
+          child: Row(
             children: [
-               Icon(Icons.square, size: 10, color: Colors.black),
-               SizedBox(width: 16),
-               Expanded(child: Text("Ubicación de destino", style: TextStyle(color: Colors.black38, fontSize: 16, fontWeight: FontWeight.w500))),
-               Icon(Icons.add, size: 20, color: Colors.black),
+               Icon(Icons.square, size: 10, color: theme.colorScheme.primary),
+               const SizedBox(width: 16),
+               const Expanded(child: Text("¿A dónde vas?", style: TextStyle(color: Colors.white38, fontSize: 16, fontWeight: FontWeight.w500))),
+               const Icon(Icons.add, size: 20, color: Colors.white70),
             ],
           )
         ),
-        const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          decoration: BoxDecoration(color: const Color(0xFFF3F3F3), borderRadius: BorderRadius.circular(12)),
-          child: const Row(
-            children: [
-               Icon(Icons.access_time_filled, size: 16, color: Colors.black),
-               SizedBox(width: 16),
-               Expanded(child: Text("Viajar ahora", style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w600))),
-               Icon(Icons.keyboard_arrow_down, size: 20, color: Colors.black),
-            ],
-          )
-        ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 20),
         Align(
           alignment: Alignment.centerLeft,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(color: const Color(0xFFF3F3F3), borderRadius: BorderRadius.circular(20)),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E1E1E), 
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: Colors.white10),
+            ),
             child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                  Icon(Icons.person, size: 14),
+                  Icon(Icons.person, size: 14, color: Color(0xFFD4AF37)),
                   SizedBox(width: 8),
-                  Text("Para mí", style: TextStyle(fontWeight: FontWeight.w600)),
+                  Text("Para mí", style: TextStyle(fontWeight: FontWeight.w700, color: Colors.white, fontSize: 12)),
                   SizedBox(width: 8),
-                  Icon(Icons.keyboard_arrow_down, size: 16),
+                  Icon(Icons.keyboard_arrow_down, size: 16, color: Colors.white70),
               ],
             )
           )
@@ -1040,12 +1171,27 @@ class _ClientDashboardInitialPageState
   }
 
   Widget _buildBlackButton(String text) {
-    return SizedBox(
+    final theme = Theme.of(context);
+    return Container(
       width: double.infinity,
+      height: 55,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [theme.colorScheme.primary, Colors.black87],
+        ),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.primary.withValues(alpha: 0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ]
+      ),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.black,
-          padding: const EdgeInsets.symmetric(vertical: 18),
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           elevation: 0,
         ),
@@ -1054,7 +1200,12 @@ class _ClientDashboardInitialPageState
         },
         child: Text(
           text,
-          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),
+          style: GoogleFonts.inter(
+            color: Colors.black, 
+            fontSize: 16, 
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.0,
+          ),
         ),
       ),
     );

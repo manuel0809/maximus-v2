@@ -33,14 +33,14 @@ class ServiceTypeCardWidget extends StatelessWidget {
         opacity: isSelected ? 1.0 : 0.03,
         gradient: isSelected
             ? const LinearGradient(
-                colors: [Color(0xFF8B1538), Color(0xFF6B0F2A)],
+                colors: [Color(0xFFD4AF37), Color(0xFFB5942D)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               )
             : null,
         border: Border.all(
           color: isSelected
-              ? const Color(0xFFE8B4B8).withValues(alpha: 0.5)
+              ? const Color(0xFFD4AF37).withValues(alpha: 0.5)
               : theme.colorScheme.outline.withValues(alpha: 0.1),
           width: 1,
         ),
@@ -83,7 +83,7 @@ class ServiceTypeCardWidget extends StatelessWidget {
                         service['title'] as String,
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w800,
-                          color: isSelected ? Colors.white : theme.colorScheme.onSurface,
+                          color: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
                         ),
                       ),
                       SizedBox(height: 0.5.h),
@@ -91,7 +91,7 @@ class ServiceTypeCardWidget extends StatelessWidget {
                         service['description'] as String,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: isSelected
-                              ? Colors.white.withValues(alpha: 0.8)
+                              ? theme.colorScheme.onPrimary.withValues(alpha: 0.8)
                               : theme.colorScheme.onSurfaceVariant,
                         ),
                         maxLines: 2,
@@ -147,7 +147,7 @@ class ServiceTypeCardWidget extends StatelessWidget {
                 Text(
                   service['capacity'] as String,
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: isSelected ? Colors.white.withValues(alpha: 0.7) : theme.colorScheme.onSurfaceVariant,
+                    color: isSelected ? theme.colorScheme.onPrimary.withValues(alpha: 0.7) : theme.colorScheme.onSurfaceVariant,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

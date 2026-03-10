@@ -248,45 +248,79 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "MAXIMUS LEVEL GROUP",
-              style: GoogleFonts.lexend(
-                color: Colors.black,
-                fontSize: 14.sp,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.0,
+      backgroundColor: const Color(0xFF0F0F0F), // Deep Luxury Noir
+      body: Stack(
+        children: [
+          // Subtle elegant background elements
+          Positioned(
+            top: -10.h,
+            right: -10.w,
+            child: Container(
+              width: 50.w,
+              height: 50.w,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFFD4AF37).withValues(alpha: 0.05),
               ),
             ),
-            Image.asset(
-              'assets/images/maximus_official_logo.png',
-              height: 40,
-              errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
-            ),
-          ],
-        ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
-          child: Center(
-            child: Container(
-              constraints: const BoxConstraints(maxWidth: 400),
-              child: _isOtpSent ? _buildOtpForm() : _buildEmailForm(),
+          ),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: 8.w),
+              child: Center(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 450),
+                  child: Column(
+                    children: [
+                      SizedBox(height: 4.h),
+                      // Luxury Header
+                      _buildLuxuryHeader(),
+                      SizedBox(height: 8.h),
+                      _isOtpSent ? _buildOtpForm() : _buildEmailForm(),
+                      SizedBox(height: 4.h),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
-        ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildLuxuryHeader() {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: const Color(0xFFD4AF37), width: 1),
+          ),
+          child: CircleAvatar(
+            radius: 35,
+            backgroundColor: Colors.white,
+            backgroundImage: const AssetImage('assets/images/maximus_official_logo.png'),
+          ),
+        ),
+        SizedBox(height: 2.h),
+        Text(
+          "MAXIMUS LEVEL GROUP",
+          style: GoogleFonts.lexend(
+            color: const Color(0xFFD4AF37),
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 2.0,
+          ),
+        ),
+        Container(
+          width: 40,
+          height: 1,
+          margin: const EdgeInsets.only(top: 8),
+          color: const Color(0xFFD4AF37).withValues(alpha: 0.5),
+        ),
+      ],
     );
   }
 
@@ -296,110 +330,82 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          '¿Cuál es tu número de teléfono o email?',
-          style: TextStyle(
-            fontSize: 20.sp,
-            fontWeight: FontWeight.w500,
-            color: Colors.black,
-            height: 1.2,
+          'Inicia sesión con tu teléfono o email',
+          style: GoogleFonts.inter(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+            letterSpacing: -0.5,
           ),
+          textAlign: TextAlign.center,
         ),
         SizedBox(height: 3.h),
         
         // Email/Phone Input Field
-        Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFFF3F3F3), // Light grey
-            borderRadius: BorderRadius.circular(8.0),
-            border: Border.all(color: Colors.transparent),
-          ),
-          child: TextField(
-            controller: _emailController,
-            keyboardType: TextInputType.emailAddress,
-            cursorColor: Colors.black,
-            style: TextStyle(
-              fontSize: 12.sp, 
-              color: Colors.black,
-            ),
-            decoration: InputDecoration(
-              hintText: 'Introducir número de teléfono o email',
-              hintStyle: TextStyle(
-                color: Colors.black54,
-                fontSize: 11.sp,
-              ),
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
-            ),
-          ),
+        _buildLuxuryTextField(
+          controller: _emailController,
+          hint: 'Número de teléfono o email',
+          icon: Icons.person_outline,
         ),
         SizedBox(height: 2.h),
 
-        // Password Input Field (Optional for OTP but required for direct login)
-        Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFFF3F3F3),
-            borderRadius: BorderRadius.circular(8.0),
-            border: Border.all(color: Colors.transparent),
-          ),
-          child: TextField(
-            controller: _passwordController,
-            obscureText: _obscurePassword,
-            cursorColor: Colors.black,
-            style: TextStyle(
-              fontSize: 12.sp, 
-              color: Colors.black,
-            ),
-            decoration: InputDecoration(
-              hintText: 'Contraseña (opcional para código por SMS/Email)',
-              hintStyle: TextStyle(
-                color: Colors.black54,
-                fontSize: 11.sp,
-              ),
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                  color: Colors.black54,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _obscurePassword = !_obscurePassword;
-                  });
-                },
-              ),
-            ),
-          ),
+        // Password Input Field
+        _buildLuxuryTextField(
+          controller: _passwordController,
+          hint: 'Contraseña (opcional)',
+          icon: Icons.lock_outline,
+          isPassword: true,
+          obscure: _obscurePassword,
+          onToggleVisibility: () => setState(() => _obscurePassword = !_obscurePassword),
         ),
         SizedBox(height: 2.h),
 
         // Submit Button
-        ElevatedButton(
-          onPressed: _loading ? null : _handleAuth,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.black,
-            padding: EdgeInsets.symmetric(vertical: 2.h),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0),
+        Container(
+          height: 55,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFFD4AF37), Color(0xFFB5942D)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFD4AF37).withValues(alpha: 0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-          child: _loading
-              ? const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          child: ElevatedButton(
+            onPressed: _loading ? null : _handleAuth,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+            ),
+            child: _loading
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : const Text(
+                    'CONTINUAR',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.black,
+                      letterSpacing: 2.0,
+                    ),
                   ),
-                )
-              : const Text(
-                  'Continuar',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
+          ),
         ),
 
         SizedBox(height: 3.h),
@@ -407,39 +413,97 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
         // Divider
         Row(
           children: [
-            const Expanded(child: Divider(color: Colors.black26)),
+            const Expanded(child: Divider(color: Colors.white24)),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 4.w),
-              child: const Text('o', style: TextStyle(color: Colors.black54)),
+              child: const Text('o continúa con', style: TextStyle(color: Colors.white54, fontSize: 12)),
             ),
-            const Expanded(child: Divider(color: Colors.black26)),
+            const Expanded(child: Divider(color: Colors.white24)),
           ],
         ),
 
         SizedBox(height: 3.h),
 
-        // Google Button
-        _buildSocialButton(
-          icon: Icons.g_mobiledata, // Fallback for G logo
-          text: 'Continuar con Google',
-          onPressed: _loading ? () {} : () => _signInWithOAuth(OAuthProvider.google),
+        // Social Buttons Row
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildRoundSocialButton(
+              icon: Icons.g_mobiledata,
+              onPressed: _loading ? () {} : () => _signInWithOAuth(OAuthProvider.google),
+            ),
+            SizedBox(width: 8.w),
+            _buildRoundSocialButton(
+              icon: Icons.apple,
+              onPressed: _loading ? () {} : () => _signInWithOAuth(OAuthProvider.apple),
+            ),
+          ],
         ),
-        SizedBox(height: 1.5.h),
         
-        // Apple Button
-        _buildSocialButton(
-          icon: Icons.apple,
-          text: 'Continuar con Apple',
-          onPressed: _loading ? () {} : () => _signInWithOAuth(OAuthProvider.apple),
-        ),
-        
-        SizedBox(height: 4.h),
+        SizedBox(height: 6.h),
         Text(
-          'Al continuar, aceptas recibir llamadas, incluidas las realizadas con marcadores automáticos, mensajes de WhatsApp o SMS de Maximus y sus afiliados.',
-          style: TextStyle(color: Colors.black54, fontSize: 9.sp, height: 1.4),
-          textAlign: TextAlign.left,
+          'Al continuar, aceptas nuestros términos y la recepción de comunicaciones de Maximus Level Group.',
+          style: TextStyle(color: Colors.white38, fontSize: 10.sp, height: 1.4),
+          textAlign: TextAlign.center,
         ),
       ],
+    );
+  }
+
+  Widget _buildLuxuryTextField({
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+    bool isPassword = false,
+    bool obscure = false,
+    VoidCallback? onToggleVisibility,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E1E1E),
+        borderRadius: BorderRadius.circular(12.0),
+        border: Border.all(color: Colors.white10),
+      ),
+      child: TextField(
+        controller: controller,
+        obscureText: obscure,
+        cursorColor: const Color(0xFFD4AF37),
+        style: TextStyle(fontSize: 12.sp, color: Colors.white),
+        decoration: InputDecoration(
+          prefixIcon: Icon(icon, color: const Color(0xFFD4AF37).withValues(alpha: 0.6), size: 20),
+          hintText: hint,
+          hintStyle: TextStyle(color: Colors.white30, fontSize: 11.sp),
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+          suffixIcon: isPassword
+              ? IconButton(
+                  icon: Icon(
+                    obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                    color: Colors.white30,
+                    size: 20,
+                  ),
+                  onPressed: onToggleVisibility,
+                )
+              : null,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRoundSocialButton({required IconData icon, required VoidCallback onPressed}) {
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(30),
+      child: Container(
+        width: 60,
+        height: 60,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: const Color(0xFF1E1E1E),
+          border: Border.all(color: Colors.white10),
+        ),
+        child: Icon(icon, color: Colors.white, size: 28),
+      ),
     );
   }
 
@@ -450,15 +514,16 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
       children: [
         SizedBox(height: 2.h),
         Text(
-          'Introduce el código de 6 dígitos que te hemos enviado a ${_emailController.text}',
-          style: TextStyle(
-            fontSize: 20.sp,
-            fontWeight: FontWeight.w500,
-            color: Colors.black,
-            height: 1.2,
+          'Introduce el código de 6 dígitos enviado a ${_emailController.text}',
+          style: GoogleFonts.inter(
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+            height: 1.4,
           ),
+          textAlign: TextAlign.center,
         ),
-        SizedBox(height: 1.h),
+        SizedBox(height: 2.h),
         GestureDetector(
           onTap: () {
             setState(() {
@@ -466,65 +531,87 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
             });
           },
           child: Text(
-            '¿Has cambiado tu número / correo?',
+            '¿Número incorrecto? Haz clic para volver',
             style: TextStyle(
               fontSize: 11.sp,
-              color: Colors.black,
+              color: const Color(0xFFD4AF37),
               decoration: TextDecoration.underline,
             ),
+            textAlign: TextAlign.center,
           ),
         ),
-        SizedBox(height: 4.h),
+        SizedBox(height: 5.h),
 
         // OTP Field
         Container(
           decoration: BoxDecoration(
-            color: const Color(0xFFF3F3F3),
-            borderRadius: BorderRadius.circular(8.0),
+            color: const Color(0xFF1E1E1E),
+            borderRadius: BorderRadius.circular(12.0),
+            border: Border.all(color: Colors.white10),
           ),
           child: TextField(
             controller: _otpController,
             keyboardType: TextInputType.number,
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 18.sp, letterSpacing: 8.0),
+            style: TextStyle(fontSize: 22.sp, letterSpacing: 12.0, color: const Color(0xFFD4AF37), fontWeight: FontWeight.bold),
             maxLength: 6,
+            cursorColor: const Color(0xFFD4AF37),
             decoration: const InputDecoration(
               counterText: "",
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(vertical: 20),
+              contentPadding: EdgeInsets.symmetric(vertical: 24),
             ),
           ),
         ),
 
-        SizedBox(height: 3.h),
+        SizedBox(height: 4.h),
 
-        ElevatedButton(
-          onPressed: _loading ? null : _handleAuth,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFFEEEEEE),
-            foregroundColor: Colors.black,
-            elevation: 0,
-            padding: EdgeInsets.symmetric(vertical: 2.h),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24.0),
+        // Verify Button
+        Container(
+          height: 55,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFFD4AF37), Color(0xFFB5942D)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFD4AF37).withValues(alpha: 0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-          child: _loading
-              ? const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+          child: ElevatedButton(
+            onPressed: _loading ? null : _handleAuth,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+            ),
+            child: _loading
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : const Text(
+                    'VERIFICAR',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.black,
+                      letterSpacing: 2.0,
+                    ),
                   ),
-                )
-              : const Text(
-                  'Siguiente',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+          ),
         ),
       ],
     );

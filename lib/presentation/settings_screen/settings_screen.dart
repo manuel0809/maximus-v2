@@ -85,7 +85,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             subtitle: const Text('Recibe actualizaciones sobre tus reservas'),
             value: notificationsEnabled,
             onChanged: (val) => setState(() => notificationsEnabled = val),
-            activeThumbColor: const Color(0xFF8B1538),
+            activeThumbColor: theme.colorScheme.primary,
+            activeTrackColor: theme.colorScheme.primary.withValues(alpha: 0.3),
           ),
           const Divider(),
           _buildSectionHeader(theme, localization.translate('privacy_settings')),
@@ -94,7 +95,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             subtitle: const Text('Usa FaceID o Huella para entrar'),
             value: biometricEnabled,
             onChanged: (val) => setState(() => biometricEnabled = val),
-            activeThumbColor: const Color(0xFF8B1538),
+            activeThumbColor: theme.colorScheme.primary,
+            activeTrackColor: theme.colorScheme.primary.withValues(alpha: 0.3),
           ),
           ListTile(
             title: Text(localization.translate('change_password')),
@@ -157,13 +159,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showModalBottomSheet(
       context: context,
       builder: (context) {
+        final theme = Theme.of(context);
         return SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
                 title: const Text('Español'),
-                trailing: localization.currentLanguage == 'ES' ? const Icon(Icons.check, color: Color(0xFF8B1538)) : null,
+                trailing: localization.currentLanguage == 'ES' ? Icon(Icons.check, color: theme.colorScheme.primary) : null,
                 onTap: () {
                   localization.setLanguage('ES');
                   Navigator.pop(context);
@@ -171,7 +174,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               ListTile(
                 title: const Text('English'),
-                trailing: localization.currentLanguage == 'EN' ? const Icon(Icons.check, color: Color(0xFF8B1538)) : null,
+                trailing: localization.currentLanguage == 'EN' ? Icon(Icons.check, color: theme.colorScheme.primary) : null,
                 onTap: () {
                   localization.setLanguage('EN');
                   Navigator.pop(context);

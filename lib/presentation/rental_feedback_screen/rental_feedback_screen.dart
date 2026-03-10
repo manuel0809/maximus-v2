@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../widgets/custom_app_bar.dart';
 
 class RentalFeedbackScreen extends StatefulWidget {
@@ -45,6 +46,8 @@ class _RentalFeedbackScreenState extends State<RentalFeedbackScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final primaryColor = theme.colorScheme.primary;
 
     return Scaffold(
       appBar: CustomAppBar(title: 'Calificar Experiencia'),
@@ -55,7 +58,7 @@ class _RentalFeedbackScreenState extends State<RentalFeedbackScreen> {
           children: [
             Text(
               '¿Qué te pareció el ${widget.vehicleName}?',
-              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
+              style: GoogleFonts.lexend(fontSize: 16.sp, fontWeight: FontWeight.w700, color: primaryColor),
             ),
             SizedBox(height: 2.h),
             _buildStarRating((val) => setState(() => _vehicleRating = val), _vehicleRating),
@@ -63,7 +66,7 @@ class _RentalFeedbackScreenState extends State<RentalFeedbackScreen> {
             SizedBox(height: 4.h),
             Text(
               '¿Cómo calificarías el servicio en general?',
-              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
+              style: GoogleFonts.lexend(fontSize: 16.sp, fontWeight: FontWeight.w700, color: primaryColor),
             ),
             SizedBox(height: 2.h),
             _buildStarRating((val) => setState(() => _experienceRating = val), _experienceRating),
@@ -71,7 +74,7 @@ class _RentalFeedbackScreenState extends State<RentalFeedbackScreen> {
             SizedBox(height: 4.h),
             Text(
               'Escribe una reseña (Opcional)',
-              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
+              style: GoogleFonts.lexend(fontSize: 14.sp, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface),
             ),
             SizedBox(height: 2.h),
             TextField(
@@ -90,8 +93,8 @@ class _RentalFeedbackScreenState extends State<RentalFeedbackScreen> {
               child: ElevatedButton(
                 onPressed: _isSubmitting ? null : _submitFeedback,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF8B1538),
-                  foregroundColor: Colors.white,
+                  backgroundColor: primaryColor,
+                  foregroundColor: theme.colorScheme.onPrimary,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 child: _isSubmitting

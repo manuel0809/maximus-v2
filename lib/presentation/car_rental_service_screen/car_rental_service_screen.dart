@@ -7,6 +7,7 @@ import './widgets/category_filter_widget.dart';
 import './widgets/vehicle_card_rental_widget.dart';
 import './widgets/date_location_search_widget.dart';
 import './widgets/vehicle_filter_bottom_sheet.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CarRentalServiceScreen extends StatefulWidget {
   const CarRentalServiceScreen({super.key});
@@ -208,12 +209,8 @@ class _CarRentalServiceScreenState extends State<CarRentalServiceScreen> {
           children: [
             AppBar(
               title: const Text('Comparar Vehículos'),
-              leading: IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () => Navigator.pop(context),
-              ),
-              backgroundColor: const Color(0xFF8B1538),
-              foregroundColor: Colors.white,
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              foregroundColor: Theme.of(context).colorScheme.primary,
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -252,12 +249,14 @@ class _CarRentalServiceScreenState extends State<CarRentalServiceScreen> {
 
   @override
   Widget build(BuildContext context) {
-// ... existing build parts
+    final theme = Theme.of(context);
+
     return Scaffold(
       floatingActionButton: selectedVehiclesForComparison.isNotEmpty
           ? FloatingActionButton.extended(
               onPressed: _showComparisonDialog,
-              backgroundColor: const Color(0xFF8B1538),
+              backgroundColor: theme.colorScheme.primary,
+              foregroundColor: theme.colorScheme.onPrimary,
               label: Text('Comparar (${selectedVehiclesForComparison.length})'),
               icon: const Icon(Icons.compare_arrows, color: Colors.white),
             )
@@ -272,7 +271,7 @@ class _CarRentalServiceScreenState extends State<CarRentalServiceScreen> {
               background: Container(
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Color(0xFF8B1538), Color(0xFFE8B4B8)],
+                    colors: [Color(0xFF0F0F0F), Color(0xFF1E1E1E)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -348,11 +347,12 @@ class _CarRentalServiceScreenState extends State<CarRentalServiceScreen> {
                         ),
                         SizedBox(height: 1.5.h),
                         Text(
-                          '🚗 Alquiler de Autos',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.bold,
+                          'Alquiler de Autos',
+                          style: GoogleFonts.lexend(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontSize: 22.sp,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.5,
                           ),
                         ),
                         SizedBox(height: 1.h),
@@ -414,9 +414,10 @@ class _CarRentalServiceScreenState extends State<CarRentalServiceScreen> {
                 children: [
                   Text(
                     'Categorías',
-                    style: TextStyle(
+                    style: GoogleFonts.lexend(
                       fontSize: 16.sp,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w700,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                   SizedBox(height: 2.h),
@@ -449,8 +450,8 @@ class _CarRentalServiceScreenState extends State<CarRentalServiceScreen> {
                     icon: Icon(
                       Icons.tune,
                       color: (minPrice != null || transmission != null || passengers != null)
-                          ? const Color(0xFF8B1538)
-                          : Colors.grey,
+                          ? Theme.of(context).colorScheme.primary
+                          : Colors.white38,
                     ),
                   ),
                 ],
@@ -565,7 +566,7 @@ class _CarRentalServiceScreenState extends State<CarRentalServiceScreen> {
               'Total Estimado:', 
               '\$${breakdown['total']?.toStringAsFixed(2)}',
               isBold: true,
-              color: const Color(0xFF8B1538),
+              color: Theme.of(context).colorScheme.primary,
             ),
           ],
         ),
@@ -577,7 +578,8 @@ class _CarRentalServiceScreenState extends State<CarRentalServiceScreen> {
           ElevatedButton(
             onPressed: () => _confirmReservation(vehicle, breakdown['total'] ?? 0),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF8B1538),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
             ),
             child: const Text(
               'Confirmar',

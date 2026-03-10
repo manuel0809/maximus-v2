@@ -86,7 +86,7 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
   }
 
   Widget _buildLevelCard(ThemeData theme, int points, String level) {
-    Color levelColor = const Color(0xFF8B1538);
+    Color levelColor = theme.colorScheme.primary;
     IconData levelIcon = Icons.shield_outlined;
     
     if (level == 'Plata') levelColor = Colors.grey;
@@ -156,16 +156,16 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
         leading: Container(
           padding: EdgeInsets.all(2.w),
           decoration: BoxDecoration(
-            color: const Color(0xFF8B1538).withValues(alpha: 0.1),
+            color: theme.colorScheme.primary.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.confirmation_number_outlined, color: Color(0xFF8B1538)),
+          child: Icon(Icons.confirmation_number_outlined, color: theme.colorScheme.primary),
         ),
         title: Text(coupon['title'] ?? 'Descuento Especial', style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text(coupon['description'] ?? 'Canjea este código en tu próxima renta'),
         trailing: Text(
           '${coupon['discount']}% OFF',
-          style: const TextStyle(color: Color(0xFF8B1538), fontWeight: FontWeight.bold),
+          style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
         ),
       ),
     );
@@ -195,15 +195,15 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
     return Container(
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
-        color: const Color(0xFFE8B4B8).withValues(alpha: 0.2),
+        color: theme.colorScheme.primary.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF8B1538).withValues(alpha: 0.3)),
+        border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
           Row(
             children: [
-              const Icon(Icons.people_outline, color: Color(0xFF8B1538)),
+              Icon(Icons.people_outline, color: theme.colorScheme.primary),
               SizedBox(width: 3.w),
               Text('Refiere y Gana', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.sp)),
             ],

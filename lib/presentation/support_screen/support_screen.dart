@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_constants.dart';
 import '../../widgets/custom_app_bar.dart';
 
@@ -42,7 +43,11 @@ class SupportScreen extends StatelessWidget {
             SizedBox(height: 4.h),
             Text(
               'Preguntas Frecuentes',
-              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              style: GoogleFonts.lexend(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.primary,
+              ),
             ),
             SizedBox(height: 2.h),
             _buildFAQList(theme),
@@ -61,11 +66,15 @@ class SupportScreen extends StatelessWidget {
         padding: EdgeInsets.all(4.w),
         child: Column(
           children: [
-            const Icon(Icons.support_agent, size: 48, color: Color(0xFF8B1538)),
+            Icon(Icons.support_agent, size: 48, color: theme.colorScheme.primary),
             SizedBox(height: 2.h),
             Text(
               '¿Cómo podemos ayudarte?',
-              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              style: GoogleFonts.lexend(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.onSurface,
+              ),
             ),
             SizedBox(height: 1.h),
             const Text(

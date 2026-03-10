@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class VehicleFilterBottomSheet extends StatefulWidget {
   final double? initialMinPrice;
@@ -40,6 +41,7 @@ class _VehicleFilterBottomSheetState extends State<VehicleFilterBottomSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final primaryColor = theme.colorScheme.primary;
 
     return Container(
       padding: EdgeInsets.all(6.w),
@@ -56,7 +58,11 @@ class _VehicleFilterBottomSheetState extends State<VehicleFilterBottomSheet> {
             children: [
               Text(
                 'Filtros Avanzados',
-                style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                style: GoogleFonts.lexend(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w700,
+                  color: primaryColor,
+                ),
               ),
               IconButton(
                 onPressed: () => Navigator.pop(context),
@@ -72,7 +78,7 @@ class _VehicleFilterBottomSheetState extends State<VehicleFilterBottomSheet> {
             min: 0,
             max: 2000,
             divisions: 20,
-            activeColor: const Color(0xFF8B1538),
+            activeColor: primaryColor,
             labels: RangeLabels(
               '\$${_priceRange.start.round()}',
               '\$${_priceRange.end.round()}',
@@ -85,11 +91,11 @@ class _VehicleFilterBottomSheetState extends State<VehicleFilterBottomSheet> {
           SizedBox(height: 1.h),
           Row(
             children: [
-              _buildChoiceChip('Cualquiera', 'all'),
+              _buildChoiceChip(theme, 'Cualquiera', 'all'),
               SizedBox(width: 2.w),
-              _buildChoiceChip('Automático', 'automatic'),
+              _buildChoiceChip(theme, 'Automático', 'automatic'),
               SizedBox(width: 2.w),
-              _buildChoiceChip('Manual', 'manual'),
+              _buildChoiceChip(theme, 'Manual', 'manual'),
             ],
           ),
 
@@ -104,9 +110,9 @@ class _VehicleFilterBottomSheetState extends State<VehicleFilterBottomSheet> {
               onSelected: (selected) {
                 if (selected) setState(() => _passengers = p);
               },
-              selectedColor: const Color(0xFF8B1538).withValues(alpha: 0.2),
+              selectedColor: primaryColor.withValues(alpha: 0.2),
               labelStyle: TextStyle(
-                color: _passengers == p ? const Color(0xFF8B1538) : null,
+                color: _passengers == p ? primaryColor : null,
                 fontWeight: _passengers == p ? FontWeight.bold : null,
               ),
             )).toList(),
@@ -127,8 +133,8 @@ class _VehicleFilterBottomSheetState extends State<VehicleFilterBottomSheet> {
                 Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF8B1538),
-                foregroundColor: Colors.white,
+                backgroundColor: primaryColor,
+                foregroundColor: theme.colorScheme.onPrimary,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               child: const Text('Aplicar Filtros', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -140,17 +146,18 @@ class _VehicleFilterBottomSheetState extends State<VehicleFilterBottomSheet> {
     );
   }
 
-  Widget _buildChoiceChip(String label, String value) {
+  Widget _buildChoiceChip(ThemeData theme, String label, String value) {
     final isSelected = _transmission == value;
+    final primaryColor = theme.colorScheme.primary;
     return ChoiceChip(
       label: Text(label),
       selected: isSelected,
       onSelected: (selected) {
         if (selected) setState(() => _transmission = value);
       },
-      selectedColor: const Color(0xFF8B1538).withValues(alpha: 0.2),
+      selectedColor: primaryColor.withValues(alpha: 0.2),
       labelStyle: TextStyle(
-        color: isSelected ? const Color(0xFF8B1538) : null,
+        color: isSelected ? primaryColor : null,
         fontWeight: isSelected ? FontWeight.bold : null,
       ),
     );

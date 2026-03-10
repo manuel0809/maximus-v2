@@ -61,10 +61,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildProfileHeader(ThemeData theme) {
     final level = userData?['membership_level'] as String? ?? 'Bronce';
     final photoUrl = userData?['photo_url'] as String?;
-    Color levelColor = const Color(0xFF8B1538);
-    if (level == 'Plata') levelColor = Colors.grey;
-    if (level == 'Oro') levelColor = Colors.amber;
-    if (level == 'Platino') levelColor = const Color(0xFFB4B4B4);
+    Color levelColor = theme.colorScheme.primary;
+    if (level == 'Plata') levelColor = const Color(0xFFC0C0C0);
+    if (level == 'Oro') levelColor = const Color(0xFFFFD700);
+    if (level == 'Platino') levelColor = const Color(0xFFE5E4E2);
 
     return Column(
       children: [
@@ -81,8 +81,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               bottom: 0,
               child: Container(
                 padding: const EdgeInsets.all(4),
-                decoration: const BoxDecoration(color: Color(0xFF8B1538), shape: BoxShape.circle),
-                child: Icon(Icons.camera_alt, size: 4.w, color: Colors.white),
+                decoration: BoxDecoration(color: theme.colorScheme.primary, shape: BoxShape.circle),
+                child: Icon(Icons.camera_alt, size: 4.w, color: theme.colorScheme.onPrimary),
               ),
             ),
           ],
