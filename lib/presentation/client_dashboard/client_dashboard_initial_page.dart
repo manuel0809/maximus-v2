@@ -315,8 +315,8 @@ class _ClientDashboardInitialPageState
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [theme.colorScheme.primary, Color(0xFFB5942D)],
+                      gradient: LinearGradient(
+                        colors: [theme.colorScheme.primary, const Color(0xFFB5942D)],
                       ),
                       borderRadius: BorderRadius.circular(24),
                     ),
@@ -1170,14 +1170,14 @@ class _ClientDashboardInitialPageState
               borderRadius: BorderRadius.circular(24),
               border: Border.all(color: Colors.white10),
             ),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                   Icon(Icons.person, size: 14, color: theme.colorScheme.primary),
-                  SizedBox(width: 8),
-                  Text("Para mí", style: TextStyle(fontWeight: FontWeight.w700, color: Colors.white, fontSize: 12)),
-                  SizedBox(width: 8),
-                  Icon(Icons.keyboard_arrow_down, size: 16, color: Colors.white70),
+                  const SizedBox(width: 8),
+                  const Text("Para mí", style: TextStyle(fontWeight: FontWeight.w700, color: Colors.white, fontSize: 12)),
+                  const SizedBox(width: 8),
+                  const Icon(Icons.keyboard_arrow_down, size: 16, color: Colors.white70),
               ],
             )
           )
