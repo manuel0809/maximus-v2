@@ -26,6 +26,8 @@ class _ClientDashboardInitialPageState
   LatLng? _currentLatLng;
   int unreadNotificationCount = 0;
   GoogleMapController? _mapController;
+  final TextEditingController _pickupController = TextEditingController();
+  final TextEditingController _destinationController = TextEditingController();
   
   // Tabs: 0 -> Viaje, 1 -> Rentas Por Horas, 2 -> Más
   int _selectedTabIndex = 0;
@@ -44,11 +46,19 @@ class _ClientDashboardInitialPageState
   final double _hourlyRate = 57.96;
 
   @override
+  void dispose() {
+    _pickupController.dispose();
+    _destinationController.dispose();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     _getCurrentLocation();
     _loadUnreadNotificationCount();
     _loadUserProfile();
+    _pickupController.text = currentLocation;
   }
 
   Future<void> _loadUnreadNotificationCount() async {
@@ -94,6 +104,7 @@ class _ClientDashboardInitialPageState
           currentLocation = locationName; 
           isLoadingLocation = false; 
           _currentLatLng = LatLng(position.latitude, position.longitude);
+          _pickupController.text = locationName;
         });
         
         if (_mapController != null && _currentLatLng != null) {
@@ -526,7 +537,6 @@ class _ClientDashboardInitialPageState
                     children: [
                       _buildMoreListTile(Icons.key, "Vehículos de alquiler", 3),
                       _buildMoreListTile(Icons.local_shipping, "Entregas", 4),
-                      _buildMoreListTile(Icons.restaurant, "Comer", 5),
                     ],
                   ),
                 ),
@@ -680,8 +690,6 @@ class _ClientDashboardInitialPageState
                     children: [
                       _buildPanelContent(),
                       const SizedBox(height: 24),
-                      _buildSuggestionsGrid(),
-                      const SizedBox(height: 24),
                     ],
                   ),
                 ),
@@ -700,17 +708,7 @@ class _ClientDashboardInitialPageState
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            transitionBuilder: (Widget child, Animation<double> animation) {
-              return FadeTransition(opacity: animation, child: child);
-            },
-            child: _buildActiveTabContent(),
-          ),
-          const SizedBox(height: 32),
-          const Divider(height: 1, color: Color(0xFFEEEEEE)),
-          const SizedBox(height: 24),
-          _buildSuggestionsGrid(),
+          _buildActiveTabContent(),
         ],
       ),
     );
@@ -919,8 +917,6 @@ class _ClientDashboardInitialPageState
             _buildSuggestionCard("Reserva", Icons.calendar_today, 2),
             _buildSuggestionCard("Autos", Icons.key, 3),
             _buildSuggestionCard("Por Horas", Icons.access_time_filled, 1),
-            _buildSuggestionCard("Comer", Icons.restaurant, 5),
-            _buildSuggestionCard("Super", Icons.shopping_basket, 6),
           ],
         )
       ],
@@ -1011,16 +1007,16 @@ class _ClientDashboardInitialPageState
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(car['time'] as String, style: const TextStyle(color: Color(0xFFD4AF37), fontSize: 12, fontWeight: FontWeight.w600)),
+                                  Text(car['time'] as String, style: TextStyle(color: theme.colorScheme.primary, fontSize: 12, fontWeight: FontWeight.w600)),
                                   Text(car['price'] as String, style: GoogleFonts.lexend(fontWeight: FontWeight.w800, fontSize: 17, color: Colors.white)),
                                 ],
                               ),
                               ElevatedButton(
                                 onPressed: () {
-                                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Reserva para ${car['name']} iniciada")));
+                                  Navigator.pushNamed(context, AppRoutes.carRentalService);
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFFD4AF37),
+                                  backgroundColor: theme.colorScheme.primary,
                                   foregroundColor: Colors.black,
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -1064,7 +1060,7 @@ class _ClientDashboardInitialPageState
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, size: 36, color: const Color(0xFFD4AF37)),
+                Icon(icon, size: 36, color: theme.colorScheme.primary),
                 const SizedBox(height: 12),
                 Text(
                   title, 
@@ -1106,9 +1102,9 @@ class _ClientDashboardInitialPageState
           ),
         ),
         const SizedBox(height: 20),
-        // Inputs
+        // Pickup Input
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           decoration: BoxDecoration(
             color: const Color(0xFF1E1E1E), 
             borderRadius: BorderRadius.circular(16),
@@ -1119,17 +1115,24 @@ class _ClientDashboardInitialPageState
                Icon(Icons.circle, size: 10, color: theme.colorScheme.primary),
                const SizedBox(width: 16),
                Expanded(
-                 child: Text(
-                   currentLocation.isNotEmpty ? currentLocation : "Ubicación de recogida", 
-                   style: TextStyle(color: currentLocation.isNotEmpty ? Colors.white : Colors.white38, fontSize: 16, fontWeight: FontWeight.w500)
+                 child: TextField(
+                   controller: _pickupController,
+                   style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+                   decoration: const InputDecoration(
+                     hintText: "Ubicación de recogida",
+                     hintStyle: TextStyle(color: Colors.white38),
+                     border: InputBorder.none,
+                     isDense: true,
+                   ),
                  )
                ),
             ],
           )
         ),
         const SizedBox(height: 12),
+        // Destination Input
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           decoration: BoxDecoration(
             color: const Color(0xFF1E1E1E), 
             borderRadius: BorderRadius.circular(16),
@@ -1139,7 +1142,19 @@ class _ClientDashboardInitialPageState
             children: [
                Icon(Icons.square, size: 10, color: theme.colorScheme.primary),
                const SizedBox(width: 16),
-               const Expanded(child: Text("¿A dónde vas?", style: TextStyle(color: Colors.white38, fontSize: 16, fontWeight: FontWeight.w500))),
+               Expanded(
+                 child: TextField(
+                   controller: _destinationController,
+                   autofocus: true,
+                   style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+                   decoration: const InputDecoration(
+                     hintText: "¿A dónde vas?",
+                     hintStyle: TextStyle(color: Colors.white38),
+                     border: InputBorder.none,
+                     isDense: true,
+                   ),
+                 )
+               ),
                const Icon(Icons.add, size: 20, color: Colors.white70),
             ],
           )
@@ -1196,7 +1211,7 @@ class _ClientDashboardInitialPageState
           elevation: 0,
         ),
         onPressed: () {
-          // Actions
+          Navigator.pushNamed(context, AppRoutes.carRentalService);
         },
         child: Text(
           text,
